@@ -1,7 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import YouTube, { YouTubePlayer } from 'react-youtube';
-import { Play, Pause, Volume2, VolumeX, Maximize, SkipForward } from 'lucide-react';
+import { Play, Pause, Volume1, Volume2, VolumeX, Maximize, SkipForward } from 'lucide-react';
 import { Video } from '@/types';
+
+const VOLUME_STORAGE_KEY = 'chronos-volume';
+
+function loadStoredVolume(): number {
+  try {
+    const v = parseInt(localStorage.getItem(VOLUME_STORAGE_KEY) ?? '100', 10);
+    return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 100;
+  } catch {
+    return 100;
+  }
+}
 
 interface VideoPlayerProps {
   video: Video | null;
@@ -37,10 +48,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const stateVersionRef = useRef(stateVersion);
   const transitionKeyRef = useRef('');
   const pauseEnforceUntilRef = useRef(0);
+  const lastNonZeroVolumeRef = useRef(100);
+  const stableVideoIdRef = useRef<string>('');
+  const loadedVideoIdRef = useRef<string>('');
   currentTimeRef.current = currentTime;
   isPlayingRef.current = isPlaying;
   stateVersionRef.current = stateVersion;
-  const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(loadStoredVolume);
   const [showControls, setShowControls] = useState(true);
   const [seekingTime, setSeekingTime] = useState<number | null>(null);
   const [hostDisplayTime, setHostDisplayTime] = useState(currentTime);
@@ -92,6 +106,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       playerRef.current.pauseVideo();
     }
   };
+
+  if (video?.id && !stableVideoIdRef.current) {
+    stableVideoIdRef.current = video.id;
+  }
+
+  useEffect(() => {
+    if (playerRef.current && video?.id && video.id !== loadedVideoIdRef.current) {
+      playerRef.current.loadVideoById({ videoId: video.id });
+      loadedVideoIdRef.current = video.id;
+      playerRef.current.setVolume(volume);
+    }
+  }, [video?.id]);
 
   useEffect(() => {
     setSeekingTime(null);
@@ -147,7 +173,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleReady = (event: { target: YouTubePlayer }) => {
     playerRef.current = event.target;
     onReady(event.target);
-    event.target.setVolume(100);
+    loadedVideoIdRef.current = video?.id ?? '';
+    event.target.setVolume(volume);
     applyAuthoritativeState(true);
   };
 
@@ -163,14 +190,28 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const toggleMute = () => {
+  useEffect(() => {
     if (playerRef.current) {
-      if (isMuted) {
-        playerRef.current.unMute();
-      } else {
-        playerRef.current.mute();
-      }
-      setIsMuted(!isMuted);
+      playerRef.current.setVolume(volume);
+    }
+  }, [volume]);
+
+  const handleVolumeChange = (value: number) => {
+    const v = Math.max(0, Math.min(100, value));
+    setVolume(v);
+    if (v > 0) lastNonZeroVolumeRef.current = v;
+    try {
+      localStorage.setItem(VOLUME_STORAGE_KEY, String(v));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const toggleMute = () => {
+    if (volume > 0) {
+      handleVolumeChange(0);
+    } else {
+      handleVolumeChange(lastNonZeroVolumeRef.current);
     }
   };
 
@@ -255,7 +296,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseLeave={() => setShowControls(false)}
     >
       <YouTube
-        videoId={video.id}
+        videoId={stableVideoIdRef.current || video.id}
         opts={opts}
         onReady={handleReady}
         onStateChange={handleStateChange}
@@ -321,16 +362,30 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={toggleMute}
-              className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5" />
-              ) : (
-                <Volume2 className="w-5 h-5" />
-              )}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleMute}
+                className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
+                aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+              >
+                {volume === 0 ? (
+                  <VolumeX className="w-5 h-5" />
+                ) : volume < 50 ? (
+                  <Volume1 className="w-5 h-5" />
+                ) : (
+                  <Volume2 className="w-5 h-5" />
+                )}
+              </button>
+              <input
+                type="range"
+                min={0}
+                max={100}
+                value={volume}
+                onChange={(e) => handleVolumeChange(Number(e.target.value))}
+                className="w-20 accent-primary-500 cursor-pointer"
+                aria-label="Volume"
+              />
+            </div>
             <button
               onClick={handleFullscreen}
               className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"

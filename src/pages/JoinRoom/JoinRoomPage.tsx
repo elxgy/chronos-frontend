@@ -37,8 +37,16 @@ export const JoinRoomPage: React.FC = () => {
       );
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to join room");
+        let errorMessage = "Failed to join room";
+        try {
+          const data = await response.json();
+          if (data?.error) errorMessage = data.error;
+        } catch {
+          if (response.status >= 500) {
+            errorMessage = "Server unavailable. Please try again later.";
+          }
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();

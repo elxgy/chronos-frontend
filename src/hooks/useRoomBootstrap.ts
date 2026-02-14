@@ -471,11 +471,16 @@ export function useRoomBootstrap(
     );
 
     fetch(`/api/rooms/${code}`, { signal: controller.signal })
-      .then((r) => {
+      .then(async (r) => {
         if (!r.ok) {
-          return r.json().then((body) => {
-            throw new Error(body.error || "Failed to load room");
-          });
+          let errorMessage = "Failed to load room";
+          try {
+            const body = await r.json();
+            if (body?.error) errorMessage = body.error;
+          } catch {
+            if (r.status >= 500) errorMessage = "Server unavailable. Please try again later.";
+          }
+          throw new Error(errorMessage);
         }
         return r.json();
       })

@@ -9,8 +9,7 @@ const mockPlayer = {
   playVideo: vi.fn(),
   pauseVideo: vi.fn(),
   setVolume: vi.fn(),
-  mute: vi.fn(),
-  unMute: vi.fn(),
+  loadVideoById: vi.fn(),
 };
 
 vi.mock('react-youtube', () => ({
@@ -35,8 +34,9 @@ describe('VideoPlayer', () => {
     mockPlayer.playVideo.mockReset();
     mockPlayer.pauseVideo.mockReset();
     mockPlayer.setVolume.mockReset();
-    mockPlayer.mute.mockReset();
-    mockPlayer.unMute.mockReset();
+    mockPlayer.loadVideoById.mockReset();
+    vi.spyOn(Storage.prototype, 'getItem').mockReturnValue('100');
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {});
   });
 
   it('does not allow non-host click overlay to trigger play', () => {
