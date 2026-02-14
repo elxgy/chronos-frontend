@@ -1,0 +1,1 @@
+export { useRoomBootstrap } from './useRoomBootstrap';
