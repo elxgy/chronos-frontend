@@ -50,14 +50,15 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
       <div
-        className="absolute inset-0 bg-dark-950/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-dark-950/80 backdrop-blur-sm cursor-default"
         onClick={onClose}
+        aria-hidden="true"
       />
       <div
         className={cn(
-          'relative w-full bg-dark-800 rounded-xl border border-dark-700 shadow-2xl animate-fade-in',
+          'relative w-full bg-dark-800 rounded-xl border border-dark-700 shadow-2xl animate-fade-in max-h-[90vh] overflow-auto',
           sizes[size]
         )}
       >
@@ -76,7 +77,8 @@ export const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 text-dark-400 hover:text-dark-200 hover:bg-dark-700 rounded-lg transition-colors"
+                className="min-w-[44px] min-h-[44px] p-2 -m-2 flex items-center justify-center text-dark-400 hover:text-dark-200 hover:bg-dark-700 rounded-lg transition-colors touch-manipulation"
+                aria-label="Close"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -116,13 +118,14 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <p className="text-dark-300 mb-6">{message}</p>
       <div className="flex gap-3 justify-end">
-        <Button variant="secondary" onClick={onClose} disabled={loading}>
+        <Button variant="secondary" onClick={onClose} disabled={loading} className="min-h-[44px] touch-manipulation">
           {cancelText}
         </Button>
         <Button
           variant={variant === 'danger' ? 'danger' : 'primary'}
           onClick={onConfirm}
           loading={loading}
+          className="min-h-[44px] touch-manipulation"
         >
           {confirmText}
         </Button>

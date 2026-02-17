@@ -45,13 +45,23 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
           <h3 className="font-semibold text-dark-100">Participants</h3>
           <span className="ml-auto badge-primary">{participants.length}</span>
         </div>
+        {participants.length > 0 && (
+          <p className="text-xs text-dark-500 mt-1">
+            {participants.length} watching
+          </p>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {participants.length === 0 ? (
           <div className="p-8 text-center">
-            <Users className="w-12 h-12 mx-auto mb-3 text-dark-500" />
-            <p className="text-dark-400">No participants yet</p>
+            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-dark-700/80 flex items-center justify-center">
+              <Users className="w-7 h-7 text-dark-500" />
+            </div>
+            <p className="text-dark-300 font-medium">No participants yet</p>
+            <p className="text-dark-500 text-sm mt-1">
+              Share the room code to invite others
+            </p>
           </div>
         ) : (
           <ul className="divide-y divide-dark-700">

@@ -43,8 +43,8 @@ interface AuthLayoutProps {
 
 export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
-    <MainLayout className="flex items-center justify-center min-h-screen">
-      <div className="w-full animate-fade-in">{children}</div>
+    <MainLayout className="flex items-center justify-center min-h-screen px-4 sm:px-6">
+      <div className="w-full max-w-md animate-fade-in">{children}</div>
     </MainLayout>
   );
 };

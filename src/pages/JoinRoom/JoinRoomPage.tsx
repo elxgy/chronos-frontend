@@ -104,7 +104,7 @@ export const JoinRoomPage: React.FC = () => {
             onChange={(e) =>
               setRoomCode(e.target.value.toUpperCase().slice(0, 6))
             }
-            className="font-mono text-center tracking-widest text-lg"
+            className="font-mono text-center tracking-widest text-lg min-h-[48px]"
             maxLength={6}
             error={error && !nickname ? "" : error}
           />
@@ -120,13 +120,14 @@ export const JoinRoomPage: React.FC = () => {
             error={nickname ? error : ""}
             leftIcon={<User className="w-5 h-5" />}
             maxLength={20}
+            className="min-h-[48px]"
           />
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <Button
               variant="secondary"
               onClick={() => navigate("/")}
-              className="flex-1"
+              className="flex-1 min-h-[48px] touch-manipulation"
             >
               Cancel
             </Button>
@@ -135,7 +136,7 @@ export const JoinRoomPage: React.FC = () => {
               variant="primary"
               loading={isLoading}
               disabled={!roomCode || !nickname}
-              className="flex-1"
+              className="flex-1 min-h-[48px] touch-manipulation"
             >
               Join Room
             </Button>

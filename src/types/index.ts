@@ -39,6 +39,8 @@ export interface RoomState {
   queue: Video[];
   participantCount: number;
   isPlaying: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
 }
 
 export interface ClientQuality {
@@ -90,7 +92,7 @@ export interface ControlMessage {
   payload?: Record<string, unknown>;
 }
 
-export type ControlType = 'play' | 'pause' | 'seek' | 'skip' | 'add_video' | 'remove_video' | 'reorder';
+export type ControlType = 'play' | 'pause' | 'seek' | 'skip' | 'add_video' | 'remove_video' | 'reorder' | 'set_autoplay' | 'set_loop';
 
 export interface WSMessage {
   type: string;
@@ -107,6 +109,8 @@ export interface SyncStateMessage {
   stateVersion: number;
   timestamp: string;
   queue: Video[];
+  autoplay?: boolean;
+  loop?: boolean;
 }
 
 export interface AddVideoPayload {
