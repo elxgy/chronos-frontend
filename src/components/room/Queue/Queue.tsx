@@ -8,7 +8,7 @@ import {
   PlayCircle,
   Repeat,
 } from 'lucide-react';
-import { cn, formatDuration } from '@/utils/helpers';
+import { cn, formatDuration, extractVideoId } from '@/utils/helpers';
 import { Button, Input, Card } from '@/components/common';
 import { Video } from '@/types';
 
@@ -39,19 +39,6 @@ export const Queue: React.FC<QueueProps> = ({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
 
-  const extractVideoId = (url: string): string | null => {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /^([a-zA-Z0-9_-]{11})$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
-
   const handleAddVideo = async () => {
     if (!newVideoUrl.trim()) return;
 
@@ -80,7 +67,7 @@ export const Queue: React.FC<QueueProps> = ({
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'));
+    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'), 10);
     if (dragIndex !== index) {
       onReorder(dragIndex, index);
     }

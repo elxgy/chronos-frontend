@@ -42,11 +42,15 @@ export const RoomPage: React.FC = () => {
 
   const handlePlayerStateChange = (playerState: number) => {
     if (playerState === 1 && player && roomState.currentVideo) {
-      const localTime = player.getCurrentTime();
-      const targetTime = roomState.currentTime;
-      const drift = localTime - targetTime;
-      if (drift > 0 || drift < -1) {
-        player.seekTo(targetTime, true);
+      try {
+        const localTime = player.getCurrentTime();
+        const targetTime = roomState.currentTime;
+        const drift = localTime - targetTime;
+        if (drift > 0 || drift < -1) {
+          player.seekTo(targetTime, true);
+        }
+      } catch {
+        // Player may be stale (e.g. video switched)
       }
     }
   };

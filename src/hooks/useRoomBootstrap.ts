@@ -107,8 +107,8 @@ function safeString(value: unknown, fallback = ""): string {
 function normalizeVideo(input: unknown): Video | null {
   if (!isRecord(input)) return null;
   const id = safeString(input.id);
-  const title = safeString(input.title);
-  if (!id || !title) return null;
+  const title = safeString(input.title) || 'Video';
+  if (!id) return null;
 
   return {
     id,

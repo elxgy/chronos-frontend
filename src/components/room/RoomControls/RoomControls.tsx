@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/common';
 import { Modal, Input } from '@/components/common';
-import { cn } from '@/utils/helpers';
+import { cn, extractVideoId } from '@/utils/helpers';
 
 interface RoomControlsProps {
   isHost: boolean;
@@ -150,19 +150,6 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
 }) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState('');
-
-  const extractVideoId = (url: string): string | null => {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /^([a-zA-Z0-9_-]{11})$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
 
   const handleAdd = () => {
     const videoId = extractVideoId(videoUrl);

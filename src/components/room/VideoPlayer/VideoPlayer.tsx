@@ -117,6 +117,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   useEffect(() => {
     setSeekingTime(null);
     setHostDisplayTime(currentTime);
+    return () => {
+      playerRef.current = null;
+    };
   }, [video?.id]);
 
   useEffect(() => {
