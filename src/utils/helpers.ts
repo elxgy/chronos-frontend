@@ -46,6 +46,30 @@ export function extractVideoId(url: string): string | null {
   return null;
 }
 
+export function extractPlaylistId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/playlist\?list=)([a-zA-Z0-9_-]{13,50})/,
+    /(?:youtube\.com\/watch\?.*list=)([a-zA-Z0-9_-]{13,50})/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+export function parseYouTubeInput(
+  url: string
+): { videoId?: string; playlistId?: string } {
+  const trimmed = url.trim();
+  const playlistId = extractPlaylistId(trimmed);
+  const videoId = extractVideoId(trimmed);
+  if (playlistId) return { playlistId };
+  if (videoId) return { videoId };
+  return {};
+}
+
 export function getQualityColor(quality: ConnectionQuality): string {
   switch (quality) {
     case 'excellent':

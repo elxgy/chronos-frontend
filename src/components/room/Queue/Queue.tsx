@@ -8,7 +8,7 @@ import {
   PlayCircle,
   Repeat,
 } from 'lucide-react';
-import { cn, formatDuration, extractVideoId } from '@/utils/helpers';
+import { cn, formatDuration, parseYouTubeInput } from '@/utils/helpers';
 import { Button, Input, Card } from '@/components/common';
 import { Video } from '@/types';
 
@@ -19,6 +19,7 @@ interface QueueProps {
   autoplay?: boolean;
   onSetAutoplay?: (enabled: boolean) => void;
   onAddVideo: (videoId: string) => void;
+  onAddPlaylist?: (playlistId: string) => void;
   onRemoveVideo: (videoId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
   onVideoClick?: (video: Video) => void;
@@ -31,6 +32,7 @@ export const Queue: React.FC<QueueProps> = ({
   autoplay = false,
   onSetAutoplay,
   onAddVideo,
+  onAddPlaylist,
   onRemoveVideo,
   onReorder,
   onVideoClick,
@@ -39,26 +41,40 @@ export const Queue: React.FC<QueueProps> = ({
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
 
-  const handleAddVideo = async () => {
+  const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
 
     setError('');
-    const videoId = extractVideoId(newVideoUrl);
+    const parsed = parseYouTubeInput(newVideoUrl);
 
-    if (!videoId) {
-      setError('Invalid YouTube URL or video ID');
+    if (parsed.playlistId) {
+      if (!onAddPlaylist) return;
+      setIsAdding(true);
+      try {
+        onAddPlaylist(parsed.playlistId);
+        setNewVideoUrl('');
+      } catch (err) {
+        setError('Failed to add playlist');
+      } finally {
+        setIsAdding(false);
+      }
       return;
     }
 
-    setIsAdding(true);
-    try {
-      await onAddVideo(videoId);
-      setNewVideoUrl('');
-    } catch (err) {
-      setError('Failed to add video');
-    } finally {
-      setIsAdding(false);
+    if (parsed.videoId) {
+      setIsAdding(true);
+      try {
+        await onAddVideo(parsed.videoId);
+        setNewVideoUrl('');
+      } catch (err) {
+        setError('Failed to add video');
+      } finally {
+        setIsAdding(false);
+      }
+      return;
     }
+
+    setError('Invalid YouTube URL, video ID, or playlist link');
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
@@ -101,7 +117,7 @@ export const Queue: React.FC<QueueProps> = ({
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
-            placeholder="Paste YouTube URL or ID"
+            placeholder="Paste YouTube URL, video ID, or playlist link"
             value={newVideoUrl}
             onChange={(e) => setNewVideoUrl(e.target.value)}
             error={error}
@@ -109,7 +125,7 @@ export const Queue: React.FC<QueueProps> = ({
           />
           <Button
             variant="primary"
-            onClick={handleAddVideo}
+            onClick={handleAdd}
             loading={isAdding}
             disabled={!newVideoUrl.trim() || isAdding}
             className="min-h-[44px] touch-manipulation sm:shrink-0"

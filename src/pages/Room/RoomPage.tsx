@@ -70,6 +70,10 @@ export const RoomPage: React.FC = () => {
     sendMessage({ type: 'add_video', payload: { videoId } });
   };
 
+  const handleAddPlaylist = (playlistId: string) => {
+    sendMessage({ type: 'add_playlist', payload: { playlistId } });
+  };
+
   const handleRemoveVideo = (videoId: string) => {
     sendMessage({ type: 'remove_video', payload: { videoId } });
   };
@@ -252,6 +256,7 @@ export const RoomPage: React.FC = () => {
                 onSeekForward10={handleSeekForward10}
                 onSetLoop={handleSetLoop}
                 onAddVideo={handleAddVideo}
+                onAddPlaylist={handleAddPlaylist}
                 onOpenAddVideo={() => setShowAddVideoModal(true)}
                 showAddVideoModal={showAddVideoModal}
                 onCloseAddVideo={() => setShowAddVideoModal(false)}
@@ -304,6 +309,7 @@ export const RoomPage: React.FC = () => {
                 autoplay={roomState.autoplay ?? false}
                 onSetAutoplay={handleSetAutoplay}
                 onAddVideo={handleAddVideo}
+                onAddPlaylist={handleAddPlaylist}
                 onRemoveVideo={handleRemoveVideo}
                 onReorder={handleReorder}
               />

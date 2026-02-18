@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/common';
 import { Modal, Input } from '@/components/common';
-import { cn, extractVideoId } from '@/utils/helpers';
+import { cn, parseYouTubeInput } from '@/utils/helpers';
 
 interface RoomControlsProps {
   isHost: boolean;
@@ -23,6 +23,7 @@ interface RoomControlsProps {
   onSeekForward10: () => void;
   onSetLoop: (enabled: boolean) => void;
   onAddVideo: (videoId: string) => void;
+  onAddPlaylist?: (playlistId: string) => void;
   onOpenAddVideo: () => void;
   showAddVideoModal: boolean;
   onCloseAddVideo: () => void;
@@ -39,6 +40,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
   onSeekForward10,
   onSetLoop,
   onAddVideo,
+  onAddPlaylist,
   onOpenAddVideo,
   showAddVideoModal,
   onCloseAddVideo,
@@ -131,7 +133,8 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
       <AddVideoModal
         isOpen={showAddVideoModal}
         onClose={onCloseAddVideo}
-        onAdd={onAddVideo}
+        onAddVideo={onAddVideo}
+        onAddPlaylist={onAddPlaylist}
       />
     </>
   );
@@ -140,27 +143,36 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 interface AddVideoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdd: (videoId: string) => void;
+  onAddVideo: (videoId: string) => void;
+  onAddPlaylist?: (playlistId: string) => void;
 }
 
 const AddVideoModal: React.FC<AddVideoModalProps> = ({
   isOpen,
   onClose,
-  onAdd,
+  onAddVideo,
+  onAddPlaylist,
 }) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState('');
 
   const handleAdd = () => {
-    const videoId = extractVideoId(videoUrl);
-    if (!videoId) {
-      setError('Invalid YouTube URL or video ID');
+    const parsed = parseYouTubeInput(videoUrl);
+    if (parsed.playlistId && onAddPlaylist) {
+      onAddPlaylist(parsed.playlistId);
+      setVideoUrl('');
+      setError('');
+      onClose();
       return;
     }
-    onAdd(videoId);
-    setVideoUrl('');
-    setError('');
-    onClose();
+    if (parsed.videoId) {
+      onAddVideo(parsed.videoId);
+      setVideoUrl('');
+      setError('');
+      onClose();
+      return;
+    }
+    setError('Invalid YouTube URL, video ID, or playlist link');
   };
 
   return (
@@ -168,11 +180,11 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
       isOpen={isOpen}
       onClose={onClose}
       title="Add Video"
-      description="Paste a YouTube URL or video ID"
+      description="Paste a YouTube URL, video ID, or playlist link"
     >
       <div className="space-y-4">
         <Input
-          placeholder="https://youtube.com/watch?v=..."
+          placeholder="https://youtube.com/watch?v=... or playlist link"
           value={videoUrl}
           onChange={(e) => {
             setVideoUrl(e.target.value);

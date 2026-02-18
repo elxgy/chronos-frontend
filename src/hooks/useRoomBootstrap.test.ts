@@ -133,7 +133,9 @@ describe('useRoomBootstrap', () => {
     });
 
     expect(result.current.participants).toHaveLength(1);
-    expect(result.current.roomState.queue).toHaveLength(0);
+    expect(result.current.roomState.queue).toHaveLength(1);
+    expect(result.current.roomState.queue[0].id).toBe('only-id');
+    expect(result.current.roomState.queue[0].title).toBe('Video');
     expect(result.current.roomState.currentTime).toBe(0);
     expect(result.current.roomState.participantCount).toBe(1);
   });
