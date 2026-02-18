@@ -9,7 +9,7 @@ import {
   Repeat,
 } from 'lucide-react';
 import { cn, formatDuration, parseYouTubeInput } from '@/utils/helpers';
-import { Button, Input, Card } from '@/components/common';
+import { Button, Input, Card, ConfirmModal } from '@/components/common';
 import { Video } from '@/types';
 
 interface QueueProps {
@@ -18,6 +18,7 @@ interface QueueProps {
   isHost: boolean;
   autoplay?: boolean;
   onSetAutoplay?: (enabled: boolean) => void;
+  onClearQueue?: () => void;
   onAddVideo: (videoId: string) => void;
   onAddPlaylist?: (playlistId: string) => void;
   onRemoveVideo: (videoId: string) => void;
@@ -31,6 +32,7 @@ export const Queue: React.FC<QueueProps> = ({
   isHost,
   autoplay = false,
   onSetAutoplay,
+  onClearQueue,
   onAddVideo,
   onAddPlaylist,
   onRemoveVideo,
@@ -40,6 +42,7 @@ export const Queue: React.FC<QueueProps> = ({
   const [newVideoUrl, setNewVideoUrl] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
@@ -98,22 +101,49 @@ export const Queue: React.FC<QueueProps> = ({
           <span className="ml-auto badge-primary">{videos.length}</span>
         </div>
 
-        {isHost && onSetAutoplay && (
-          <button
-            onClick={() => onSetAutoplay(!autoplay)}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors mb-4 touch-manipulation',
-              autoplay
-                ? 'bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30'
-                : 'bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300'
-            )}
-            title={autoplay ? 'Autoplay on' : 'Autoplay off'}
-            aria-label={autoplay ? 'Autoplay on' : 'Autoplay off'}
-          >
-            <Repeat className="w-3.5 h-3.5" />
-            Autoplay
-          </button>
-        )}
+        <div className="flex items-center justify-between gap-2 mb-4">
+          {isHost && onSetAutoplay && (
+            <button
+              onClick={() => onSetAutoplay(!autoplay)}
+              className={cn(
+                'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation',
+                autoplay
+                  ? 'bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30'
+                  : 'bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300'
+              )}
+              title={autoplay ? 'Autoplay on' : 'Autoplay off'}
+              aria-label={autoplay ? 'Autoplay on' : 'Autoplay off'}
+            >
+              <Repeat className="w-3.5 h-3.5" />
+              Autoplay
+            </button>
+          )}
+          {isHost && onClearQueue && videos.length > 0 && (
+            <button
+              onClick={() => setShowClearConfirm(true)}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-red-400 hover:border-red-500/40"
+              title="Clear queue"
+              aria-label="Clear queue"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear
+            </button>
+          )}
+        </div>
+
+        <ConfirmModal
+          isOpen={showClearConfirm}
+          onClose={() => setShowClearConfirm(false)}
+          onConfirm={() => {
+            onClearQueue?.();
+            setShowClearConfirm(false);
+          }}
+          title="Clear queue?"
+          message="All queued videos will be removed. The current video will keep playing."
+          confirmText="Clear"
+          cancelText="Cancel"
+          variant="danger"
+        />
 
         <div className="flex flex-col sm:flex-row gap-2">
           <Input

@@ -98,6 +98,10 @@ export const RoomPage: React.FC = () => {
     sendMessage({ type: 'control', payload: { type: 'set_loop', payload: { enabled } } });
   };
 
+  const handleClearQueue = () => {
+    sendMessage({ type: 'clear_queue', payload: {} });
+  };
+
   const handleSeekBack10 = () => {
     if (!isHost || !roomState.currentVideo) {
       return;
@@ -268,12 +272,10 @@ export const RoomPage: React.FC = () => {
         <aside
           className={cn(
             'border-l border-dark-700 bg-dark-900/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0',
-            'lg:flex lg:w-80',
             showSidebar
-              ? 'fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-80 lg:relative lg:inset-auto lg:bottom-auto'
-              : 'hidden lg:flex lg:w-80'
+              ? 'fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-80 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-80'
+              : 'hidden'
           )}
-          style={showSidebar ? { top: 'var(--header-height)' } : undefined}
         >
           <div className="flex border-b border-dark-700 shrink-0">
             <button
@@ -308,6 +310,7 @@ export const RoomPage: React.FC = () => {
                 isHost={isHost}
                 autoplay={roomState.autoplay ?? false}
                 onSetAutoplay={handleSetAutoplay}
+                onClearQueue={handleClearQueue}
                 onAddVideo={handleAddVideo}
                 onAddPlaylist={handleAddPlaylist}
                 onRemoveVideo={handleRemoveVideo}
@@ -325,7 +328,7 @@ export const RoomPage: React.FC = () => {
 
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="fixed bottom-4 right-4 z-50 lg:hidden min-h-[48px] min-w-[48px] flex items-center justify-center bg-dark-800 border border-dark-600 px-4 py-2.5 rounded-xl text-sm font-medium text-dark-200 hover:text-dark-50 hover:bg-dark-700 transition-colors touch-manipulation shadow-lg"
+          className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-dark-800 border border-dark-600 px-4 py-2.5 rounded-xl text-sm font-medium text-dark-200 hover:text-dark-50 hover:bg-dark-700 transition-colors touch-manipulation shadow-lg"
           aria-label={showSidebar ? 'Hide panel' : 'Show panel'}
         >
           {showSidebar ? 'Hide' : 'Queue & People'}

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { RoomPage } from './RoomPage';
 import type { UseRoomBootstrapResult } from '@/hooks/useRoomBootstrap';
 import type { RoomState } from '@/types';
@@ -97,5 +97,38 @@ describe('RoomPage', () => {
     renderRoomPage();
 
     expect(screen.getByText('Realtime disconnected, reconnecting...')).toBeInTheDocument();
+  });
+
+  it('sends clear_queue when host confirms clear', async () => {
+    const sendMessage = vi.fn();
+    mockUseRoomBootstrap.mockReturnValue(
+      buildHookResult({
+        phase: 'ready',
+        sendMessage,
+        roomState: {
+          ...baseRoomState,
+          queue: [
+            {
+              id: 'v1',
+              title: 'Video 1',
+              thumbnail: '',
+              duration: 60,
+              addedBy: 'p1',
+              addedAt: '',
+              addedByName: 'Host',
+            },
+          ],
+        },
+      })
+    );
+
+    renderRoomPage();
+
+    const showPanelButtons = screen.getAllByRole('button', { name: 'Show panel' });
+    fireEvent.click(showPanelButtons[showPanelButtons.length - 1]);
+    fireEvent.click(screen.getByRole('button', { name: 'Clear queue' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+
+    expect(sendMessage).toHaveBeenCalledWith({ type: 'clear_queue', payload: {} });
   });
 });
