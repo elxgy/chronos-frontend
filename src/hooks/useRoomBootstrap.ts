@@ -33,6 +33,8 @@ const initialRoomState: RoomState = {
   queue: [],
   participantCount: 1,
   isPlaying: false,
+  autoplay: false,
+  loop: false,
 };
 
 type BootstrapState = {
@@ -105,8 +107,8 @@ function safeString(value: unknown, fallback = ""): string {
 function normalizeVideo(input: unknown): Video | null {
   if (!isRecord(input)) return null;
   const id = safeString(input.id);
-  const title = safeString(input.title);
-  if (!id || !title) return null;
+  const title = safeString(input.title) || 'Video';
+  if (!id) return null;
 
   return {
     id,
@@ -175,6 +177,8 @@ function normalizeRoomSnapshot(
     0,
     Math.floor(safeNumber(input.participantCount, participantCountFallback)),
   );
+  const autoplay = safeBool(input.autoplay, false);
+  const loop = safeBool(input.loop, false);
 
   return {
     currentVideo,
@@ -187,6 +191,8 @@ function normalizeRoomSnapshot(
     queue,
     participantCount,
     isPlaying,
+    autoplay,
+    loop,
   };
 }
 

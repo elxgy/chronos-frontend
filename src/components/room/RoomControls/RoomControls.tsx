@@ -6,19 +6,22 @@ import {
   FastForward,
   SkipForward,
   Plus,
+  Repeat1,
 } from 'lucide-react';
 import { Button } from '@/components/common';
 import { Modal, Input } from '@/components/common';
-import { cn } from '@/utils/helpers';
+import { cn, extractVideoId } from '@/utils/helpers';
 
 interface RoomControlsProps {
   isHost: boolean;
   isPlaying: boolean;
+  loop: boolean;
   onPlay: () => void;
   onPause: () => void;
   onSkip: () => void;
   onSeekBack10: () => void;
   onSeekForward10: () => void;
+  onSetLoop: (enabled: boolean) => void;
   onAddVideo: (videoId: string) => void;
   onOpenAddVideo: () => void;
   showAddVideoModal: boolean;
@@ -28,11 +31,13 @@ interface RoomControlsProps {
 export const RoomControls: React.FC<RoomControlsProps> = ({
   isHost,
   isPlaying,
+  loop,
   onPlay,
   onPause,
   onSkip,
   onSeekBack10,
   onSeekForward10,
+  onSetLoop,
   onAddVideo,
   onOpenAddVideo,
   showAddVideoModal,
@@ -40,13 +45,13 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 }) => {
   return (
     <>
-      <div className="flex items-center justify-center gap-3 py-4">
+      <div className="flex items-center justify-center gap-2 sm:gap-3 py-4 flex-wrap">
         {isHost ? (
           <>
             <button
               onClick={isPlaying ? onPause : onPlay}
               className={cn(
-                'p-4 rounded-full transition-all duration-200',
+                'min-w-[48px] min-h-[48px] p-4 rounded-full transition-all duration-200 flex items-center justify-center touch-manipulation',
                 isPlaying
                   ? 'bg-dark-700 hover:bg-dark-600 text-dark-200'
                   : 'bg-primary-600 hover:bg-primary-500 text-white shadow-glow'
@@ -61,13 +66,13 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onSkip}
-              className="p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
             >
               <SkipForward className="w-6 h-6" />
             </button>
             <button
               onClick={onSeekBack10}
-              className="p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
               title="Go back 10 seconds"
               aria-label="Go back 10 seconds"
             >
@@ -75,7 +80,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             </button>
             <button
               onClick={onSeekForward10}
-              className="p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
               title="Skip forward 10 seconds"
               aria-label="Skip forward 10 seconds"
             >
@@ -83,8 +88,23 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             </button>
 
             <button
+              onClick={() => onSetLoop(!loop)}
+              className={cn(
+                'min-w-[48px] min-h-[48px] p-4 rounded-full transition-all flex items-center justify-center touch-manipulation',
+                loop
+                  ? 'bg-primary-600 hover:bg-primary-500 text-white'
+                  : 'bg-dark-700 hover:bg-dark-600 text-dark-200'
+              )}
+              title={loop ? 'Loop on: replay current video when it ends' : 'Loop off'}
+              aria-label={loop ? 'Loop on' : 'Loop off'}
+            >
+              <Repeat1 className="w-6 h-6" />
+            </button>
+
+            <button
               onClick={onOpenAddVideo}
-              className="p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
+              aria-label="Add video"
             >
               <Plus className="w-6 h-6" />
             </button>
@@ -130,19 +150,6 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
 }) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState('');
-
-  const extractVideoId = (url: string): string | null => {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /^([a-zA-Z0-9_-]{11})$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
 
   const handleAdd = () => {
     const videoId = extractVideoId(videoUrl);

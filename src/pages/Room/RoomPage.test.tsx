@@ -22,6 +22,8 @@ const baseRoomState: RoomState = {
   queue: [],
   participantCount: 1,
   isPlaying: false,
+  autoplay: false,
+  loop: false,
 };
 
 function buildHookResult(overrides: Partial<UseRoomBootstrapResult>): UseRoomBootstrapResult {
@@ -68,7 +70,7 @@ describe('RoomPage', () => {
 
     renderRoomPage();
 
-    expect(screen.getByText('Loading room...')).toBeInTheDocument();
+    expect(screen.getByText('Connecting to room...')).toBeInTheDocument();
   });
 
   it('renders fatal branch with room load error', () => {

@@ -101,13 +101,14 @@ export const CreateRoomPage: React.FC = () => {
             error={error}
             leftIcon={<User className="w-5 h-5" />}
             maxLength={20}
+            className="min-h-[48px]"
           />
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 sm:gap-4">
             <Button
               variant="secondary"
               onClick={() => navigate("/")}
-              className="flex-1"
+              className="flex-1 min-h-[48px] touch-manipulation"
             >
               Cancel
             </Button>
@@ -115,7 +116,7 @@ export const CreateRoomPage: React.FC = () => {
               type="submit"
               variant="primary"
               loading={isLoading}
-              className="flex-1"
+              className="flex-1 min-h-[48px] touch-manipulation"
             >
               Create & Join
             </Button>

@@ -6,8 +6,9 @@ import {
   Trash2,
   Clock,
   PlayCircle,
+  Repeat,
 } from 'lucide-react';
-import { cn, formatDuration } from '@/utils/helpers';
+import { cn, formatDuration, extractVideoId } from '@/utils/helpers';
 import { Button, Input, Card } from '@/components/common';
 import { Video } from '@/types';
 
@@ -15,6 +16,8 @@ interface QueueProps {
   videos: Video[];
   currentVideoId?: string;
   isHost: boolean;
+  autoplay?: boolean;
+  onSetAutoplay?: (enabled: boolean) => void;
   onAddVideo: (videoId: string) => void;
   onRemoveVideo: (videoId: string) => void;
   onReorder: (fromIndex: number, toIndex: number) => void;
@@ -25,6 +28,8 @@ export const Queue: React.FC<QueueProps> = ({
   videos,
   currentVideoId,
   isHost,
+  autoplay = false,
+  onSetAutoplay,
   onAddVideo,
   onRemoveVideo,
   onReorder,
@@ -33,19 +38,6 @@ export const Queue: React.FC<QueueProps> = ({
   const [newVideoUrl, setNewVideoUrl] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
-
-  const extractVideoId = (url: string): string | null => {
-    const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /^([a-zA-Z0-9_-]{11})$/,
-    ];
-
-    for (const pattern of patterns) {
-      const match = url.match(pattern);
-      if (match) return match[1];
-    }
-    return null;
-  };
 
   const handleAddVideo = async () => {
     if (!newVideoUrl.trim()) return;
@@ -75,7 +67,7 @@ export const Queue: React.FC<QueueProps> = ({
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'));
+    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'), 10);
     if (dragIndex !== index) {
       onReorder(dragIndex, index);
     }
@@ -90,19 +82,37 @@ export const Queue: React.FC<QueueProps> = ({
           <span className="ml-auto badge-primary">{videos.length}</span>
         </div>
 
-        <div className="flex gap-2">
+        {isHost && onSetAutoplay && (
+          <button
+            onClick={() => onSetAutoplay(!autoplay)}
+            className={cn(
+              'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors mb-4 touch-manipulation',
+              autoplay
+                ? 'bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30'
+                : 'bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300'
+            )}
+            title={autoplay ? 'Autoplay on' : 'Autoplay off'}
+            aria-label={autoplay ? 'Autoplay on' : 'Autoplay off'}
+          >
+            <Repeat className="w-3.5 h-3.5" />
+            Autoplay
+          </button>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-2">
           <Input
             placeholder="Paste YouTube URL or ID"
             value={newVideoUrl}
             onChange={(e) => setNewVideoUrl(e.target.value)}
             error={error}
-            className="text-sm"
+            className="text-sm min-h-[44px]"
           />
           <Button
             variant="primary"
             onClick={handleAddVideo}
             loading={isAdding}
             disabled={!newVideoUrl.trim() || isAdding}
+            className="min-h-[44px] touch-manipulation sm:shrink-0"
           >
             <Plus className="w-4 h-4" />
           </Button>
@@ -112,10 +122,12 @@ export const Queue: React.FC<QueueProps> = ({
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {videos.length === 0 ? (
           <div className="p-8 text-center">
-            <ListMusic className="w-12 h-12 mx-auto mb-3 text-dark-500" />
-            <p className="text-dark-400">Queue is empty</p>
+            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-dark-700/80 flex items-center justify-center">
+              <ListMusic className="w-7 h-7 text-dark-500" />
+            </div>
+            <p className="text-dark-300 font-medium">Queue is empty</p>
             <p className="text-dark-500 text-sm mt-1">
-              Add videos to watch together
+              Add your first video above to watch together
             </p>
           </div>
         ) : (

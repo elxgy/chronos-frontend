@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    --header-height: 3.5rem;
     --bg-primary: #020617;
     --bg-secondary: #0f172a;
     --bg-tertiary: #1e293b;
@@ -21,6 +22,7 @@
   body {
     @apply bg-dark-950 text-dark-50 antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    touch-action: manipulation;
   }
 
   html {

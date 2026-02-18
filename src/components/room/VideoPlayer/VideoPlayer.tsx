@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import YouTube, { YouTubePlayer } from 'react-youtube';
-import { Play, Pause, Volume1, Volume2, VolumeX, Maximize, SkipForward } from 'lucide-react';
+import { Play, Pause, Volume1, Volume2, VolumeX, Maximize, Minimize, SkipForward } from 'lucide-react';
 import { Video } from '@/types';
 
 const VOLUME_STORAGE_KEY = 'chronos-volume';
@@ -49,8 +49,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const transitionKeyRef = useRef('');
   const pauseEnforceUntilRef = useRef(0);
   const lastNonZeroVolumeRef = useRef(100);
-  const stableVideoIdRef = useRef<string>('');
-  const loadedVideoIdRef = useRef<string>('');
   currentTimeRef.current = currentTime;
   isPlayingRef.current = isPlaying;
   stateVersionRef.current = stateVersion;
@@ -58,7 +56,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(true);
   const [seekingTime, setSeekingTime] = useState<number | null>(null);
   const [hostDisplayTime, setHostDisplayTime] = useState(currentTime);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   seekingTimeRef.current = seekingTime;
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
 
   const formatTime = (seconds: number): string => {
     const safe = Math.max(0, Math.floor(seconds));
@@ -107,21 +114,12 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  if (video?.id && !stableVideoIdRef.current) {
-    stableVideoIdRef.current = video.id;
-  }
-
-  useEffect(() => {
-    if (playerRef.current && video?.id && video.id !== loadedVideoIdRef.current) {
-      playerRef.current.loadVideoById({ videoId: video.id });
-      loadedVideoIdRef.current = video.id;
-      playerRef.current.setVolume(volume);
-    }
-  }, [video?.id]);
-
   useEffect(() => {
     setSeekingTime(null);
     setHostDisplayTime(currentTime);
+    return () => {
+      playerRef.current = null;
+    };
   }, [video?.id]);
 
   useEffect(() => {
@@ -173,7 +171,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleReady = (event: { target: YouTubePlayer }) => {
     playerRef.current = event.target;
     onReady(event.target);
-    loadedVideoIdRef.current = video?.id ?? '';
     event.target.setVolume(volume);
     applyAuthoritativeState(true);
   };
@@ -217,7 +214,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const handleFullscreen = () => {
     const container = document.getElementById('video-container');
-    if (container?.requestFullscreen) {
+    if (!container) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.();
+    } else if (container.requestFullscreen) {
       container.requestFullscreen();
     }
   };
@@ -275,14 +275,16 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     return (
       <div
         id="video-container"
-        className="relative w-full aspect-video bg-dark-800 rounded-xl border border-dark-700 overflow-hidden flex items-center justify-center"
+        className="relative w-full min-h-[200px] aspect-video bg-dark-800/80 rounded-xl border border-dark-700 overflow-hidden flex items-center justify-center"
       >
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-dark-700 flex items-center justify-center">
+        <div className="text-center px-6 py-8">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-dark-700/80 flex items-center justify-center border border-dark-600">
             <Play className="w-10 h-10 text-dark-500" />
           </div>
-          <p className="text-dark-400">No video playing</p>
-          <p className="text-dark-500 text-sm mt-1">Add a video to start watching together</p>
+          <p className="text-dark-300 font-medium">No video playing</p>
+          <p className="text-dark-500 text-sm mt-1 max-w-xs mx-auto">
+            Add a YouTube video to start watching together in sync
+          </p>
         </div>
       </div>
     );
@@ -296,7 +298,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseLeave={() => setShowControls(false)}
     >
       <YouTube
-        videoId={stableVideoIdRef.current || video.id}
+        key={video.id}
+        videoId={video.id}
         opts={opts}
         onReady={handleReady}
         onStateChange={handleStateChange}
@@ -341,19 +344,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3">
             {isHost && (
               <>
                 <button
                   onClick={isPlaying ? onPause : onPlay}
-                  className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
                 >
                   {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
                 </button>
                 <button
                   onClick={handleSkip}
-                  className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
                 >
                   <SkipForward className="w-5 h-5" />
                 </button>
@@ -361,11 +364,11 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={toggleMute}
-                className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
+                className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
                 aria-label={volume === 0 ? 'Unmute' : 'Mute'}
               >
                 {volume === 0 ? (
@@ -382,24 +385,29 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 max={100}
                 value={volume}
                 onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                className="w-20 accent-primary-500 cursor-pointer"
+                className="w-16 sm:w-20 accent-primary-500 cursor-pointer touch-manipulation"
                 aria-label="Volume"
               />
             </div>
             <button
               onClick={handleFullscreen}
-              className="p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors"
+              className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
+              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
             >
-              <Maximize className="w-5 h-5" />
+              {isFullscreen ? (
+                <Minimize className="w-5 h-5" />
+              ) : (
+                <Maximize className="w-5 h-5" />
+              )}
             </button>
           </div>
         </div>
       </div>
 
       {isHost && isPlaying && (
-        <div className="absolute top-4 right-4 z-30">
-          <span className="badge-warning">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse mr-2" />
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
+            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
             Syncing
           </span>
         </div>
