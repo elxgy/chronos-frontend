@@ -101,12 +101,12 @@ export const Queue: React.FC<QueueProps> = ({
           <span className="ml-auto badge-primary">{videos.length}</span>
         </div>
 
-        <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4 min-w-0">
           {isHost && onSetAutoplay && (
             <button
               onClick={() => onSetAutoplay(!autoplay)}
               className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation',
+                'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0',
                 autoplay
                   ? 'bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30'
                   : 'bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300'
@@ -121,7 +121,7 @@ export const Queue: React.FC<QueueProps> = ({
           {isHost && onClearQueue && videos.length > 0 && (
             <button
               onClick={() => setShowClearConfirm(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-red-400 hover:border-red-500/40"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-red-400 hover:border-red-500/40"
               title="Clear queue"
               aria-label="Clear queue"
             >

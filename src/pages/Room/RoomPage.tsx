@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { YouTubePlayer } from 'react-youtube';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, X } from 'lucide-react';
 import { cn } from '@/utils/helpers';
 import { Header, MainLayout } from '@/components/layout';
 import { VideoPlayer, Queue, ParticipantList, RoomControls } from '@/components/room';
@@ -273,11 +273,11 @@ export const RoomPage: React.FC = () => {
           className={cn(
             'border-l border-dark-700 bg-dark-900/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0',
             showSidebar
-              ? 'fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-80 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-80'
+              ? 'fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-96 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96'
               : 'hidden'
           )}
         >
-          <div className="flex border-b border-dark-700 shrink-0">
+          <div className="flex items-center border-b border-dark-700 shrink-0">
             <button
               onClick={() => setSidebarTab('queue')}
               className={cn(
@@ -299,6 +299,13 @@ export const RoomPage: React.FC = () => {
               )}
             >
               People ({participants.length})
+            </button>
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-3 text-dark-400 hover:text-dark-200 hover:bg-dark-800/50 transition-colors touch-manipulation shrink-0"
+              aria-label="Hide panel"
+            >
+              <X className="w-5 h-5" />
             </button>
           </div>
 
@@ -326,13 +333,15 @@ export const RoomPage: React.FC = () => {
           </div>
         </aside>
 
-        <button
-          onClick={() => setShowSidebar(!showSidebar)}
-          className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-dark-800 border border-dark-600 px-4 py-2.5 rounded-xl text-sm font-medium text-dark-200 hover:text-dark-50 hover:bg-dark-700 transition-colors touch-manipulation shadow-lg"
-          aria-label={showSidebar ? 'Hide panel' : 'Show panel'}
-        >
-          {showSidebar ? 'Hide' : 'Queue & People'}
-        </button>
+        {!showSidebar && (
+          <button
+            onClick={() => setShowSidebar(true)}
+            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-dark-800 border border-dark-600 px-4 py-2.5 rounded-xl text-sm font-medium text-dark-200 hover:text-dark-50 hover:bg-dark-700 transition-colors touch-manipulation shadow-lg"
+            aria-label="Show panel"
+          >
+            Queue & People
+          </button>
+        )}
         {showSidebar && (
           <div
             className="fixed inset-0 z-20 bg-dark-950/60 backdrop-blur-sm lg:hidden"
