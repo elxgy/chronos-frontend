@@ -12,6 +12,7 @@ A React + TypeScript frontend for the chronos synchronized YouTube watching expe
 - **Icons**: Lucide React
 - **State**: React Context + Hooks
 
+```
 src/
 ├── assets/          # Static assets
 ├── components/      # Reusable components
@@ -23,3 +24,4 @@ src/
 ├── styles/          # Global styles
 ├── types/           # TypeScript types
 └── utils/           # Utility functions
+```

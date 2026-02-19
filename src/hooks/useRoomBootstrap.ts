@@ -5,6 +5,7 @@ import { getApiUrl, getWsUrl } from "@/config";
 
 const STORAGE_KEY = "chronos-session";
 const FETCH_TIMEOUT_MS = 10000;
+const KEEP_ALIVE_INTERVAL_MS = 5 * 60 * 1000; // ping backend so Render free tier does not spin down while user is in room
 
 type RoomNavigationState = {
   nickname?: string;
@@ -430,6 +431,14 @@ export function useRoomBootstrap(
   useEffect(() => {
     participantsCountRef.current = state.participants.length;
   }, [state.participants.length]);
+
+  useEffect(() => {
+    if (state.phase !== "ready") return;
+    const id = window.setInterval(() => {
+      fetch(getApiUrl("/health")).catch(() => {}); // keep backend awake on Render free tier
+    }, KEEP_ALIVE_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [state.phase]);
 
   const sendMessage = useCallback((message: Record<string, unknown>) => {
     if (wsRef.current?.readyState === WebSocket.OPEN) {
