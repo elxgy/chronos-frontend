@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
 import { RoomState, Video, Participant } from "@/types";
+import { getApiUrl, getWsUrl } from "@/config";
 
 const STORAGE_KEY = "chronos-session";
 const FETCH_TIMEOUT_MS = 10000;
@@ -476,7 +477,7 @@ export function useRoomBootstrap(
       FETCH_TIMEOUT_MS,
     );
 
-    fetch(`/api/rooms/${code}`, { signal: controller.signal })
+    fetch(getApiUrl(`/api/rooms/${code}`), { signal: controller.signal })
       .then(async (r) => {
         if (!r.ok) {
           let errorMessage = "Failed to load room";
@@ -650,8 +651,10 @@ export function useRoomBootstrap(
       }
 
       const seq = ++connectionSeqRef.current;
-      const protocol = window.location.protocol === "https:" ? "wss" : "ws";
-      const wsUrl = `${protocol}://${window.location.host}/ws?roomCode=${encodeURIComponent(code)}&participantId=${encodeURIComponent(activeSession.participantId)}`;
+      const wsUrl = getWsUrl("/ws", {
+        roomCode: code,
+        participantId: activeSession.participantId,
+      });
       const socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {

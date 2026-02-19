@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { User, ArrowLeft, Users } from "lucide-react";
 import { Button, Input, Card } from "@/components/common";
 import { AuthLayout } from "@/components/layout";
+import { getApiUrl } from "@/config";
 
 export const JoinRoomPage: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ export const JoinRoomPage: React.FC = () => {
 
     try {
       const response = await fetch(
-        `/api/rooms/${roomCode.toUpperCase()}/join`,
+        getApiUrl(`/api/rooms/${roomCode.toUpperCase()}/join`),
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

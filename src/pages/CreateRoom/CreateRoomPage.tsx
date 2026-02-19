@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { User, ArrowLeft, Sparkles } from "lucide-react";
 import { Button, Input, Card } from "@/components/common";
 import { AuthLayout } from "@/components/layout";
+import { getApiUrl } from "@/config";
 
 export const CreateRoomPage: React.FC = () => {
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const CreateRoomPage: React.FC = () => {
     setError("");
 
     try {
-      const response = await fetch("/api/rooms", {
+      const response = await fetch(getApiUrl("/api/rooms"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nickname }),
