@@ -19,14 +19,20 @@ export interface Participant {
   isHost: boolean;
   isActive: boolean;
   connected: boolean;
+  disconnectedAt?: string;
   quality: ConnectionQuality;
   latencyMs: number;
   lastPingAt: string;
 }
 
-export type ConnectionQuality = 'excellent' | 'good' | 'fair' | 'poor' | 'unknown';
+export type ConnectionQuality =
+  | "excellent"
+  | "good"
+  | "fair"
+  | "poor"
+  | "unknown";
 
-export type PlaybackState = 'unstarted' | 'playing' | 'paused' | 'ended';
+export type PlaybackState = "unstarted" | "playing" | "paused" | "ended";
 
 export interface RoomState {
   currentVideo: Video | null;
@@ -55,7 +61,7 @@ export interface ClientQuality {
 }
 
 export interface RoomQualityMessage {
-  type: 'room_quality';
+  type: "room_quality";
   roomCode: RoomCode;
   participants: ClientQuality[];
   averageLatencyMs: number;
@@ -92,7 +98,17 @@ export interface ControlMessage {
   payload?: Record<string, unknown>;
 }
 
-export type ControlType = 'play' | 'pause' | 'seek' | 'skip' | 'add_video' | 'remove_video' | 'reorder' | 'set_autoplay' | 'set_loop';
+export type ControlType =
+  | "play"
+  | "pause"
+  | "seek"
+  | "skip"
+  | "add_video"
+  | "remove_video"
+  | "reorder"
+  | "set_autoplay"
+  | "set_loop"
+  | "shuffle_queue";
 
 export interface WSMessage {
   type: string;
@@ -100,7 +116,7 @@ export interface WSMessage {
 }
 
 export interface SyncStateMessage {
-  type: 'state_sync';
+  type: "state_sync";
   currentVideo: Video | null;
   currentTime: number;
   isPlaying: boolean;
@@ -127,17 +143,17 @@ export interface ReorderPayload {
 }
 
 export interface ErrorMessage {
-  type: 'error';
+  type: "error";
   code: string;
   message: string;
 }
 
 export interface ParticipantEvent {
-  type: 'participant_joined' | 'participant_left';
+  type: "participant_joined" | "participant_left" | "participant_disconnected";
   participant: Participant;
 }
 
 export interface QueueUpdateEvent {
-  type: 'queue_updated';
+  type: "queue_updated";
   queue: Video[];
 }

@@ -1,11 +1,13 @@
 import { useEffect, useReducer, useRef, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { RoomState, Video, Participant } from "@/types";
+import { RoomState, Video, Participant, ClientQuality } from "@/types";
 import { getApiUrl, getWsUrl } from "@/config";
 
 const STORAGE_KEY = "chronos-session";
 const FETCH_TIMEOUT_MS = 10000;
 const KEEP_ALIVE_INTERVAL_MS = 5 * 60 * 1000; // ping backend so Render free tier does not spin down while user is in room
+const QUALITY_POLL_INTERVAL_MS = 10_000; // poll quality every 10 seconds (matches ping interval)
+const PING_INTERVAL_MS = 10_000; // send app-level ping every 10 seconds to measure latency
 
 type RoomNavigationState = {
   nickname?: string;
@@ -68,7 +70,9 @@ type BootstrapAction =
   | { type: "SET_PARTICIPANTS"; participants: Participant[] }
   | { type: "PARTICIPANT_JOINED"; participant: Participant }
   | { type: "PARTICIPANT_LEFT"; participantId: string }
-  | { type: "SET_QUEUE"; queue: Video[] };
+  | { type: "PARTICIPANT_DISCONNECTED"; participantId: string }
+  | { type: "SET_QUEUE"; queue: Video[] }
+  | { type: "UPDATE_PARTICIPANT_QUALITY"; qualities: ClientQuality[] };
 
 const initialBootstrapState: BootstrapState = {
   phase: "initial",
@@ -109,7 +113,7 @@ function safeString(value: unknown, fallback = ""): string {
 function normalizeVideo(input: unknown): Video | null {
   if (!isRecord(input)) return null;
   const id = safeString(input.id);
-  const title = safeString(input.title) || 'Video';
+  const title = safeString(input.title) || "Video";
   if (!id) return null;
 
   return {
@@ -309,6 +313,38 @@ function bootstrapReducer(
         lastAppliedVersion: state.lastAppliedVersion,
       };
     }
+    case "PARTICIPANT_DISCONNECTED": {
+      const participants = state.participants.map((p) =>
+        p.id === action.participantId
+          ? { ...p, connected: false, isActive: false }
+          : p,
+      );
+      return {
+        ...state,
+        participants,
+      };
+    }
+    case "UPDATE_PARTICIPANT_QUALITY": {
+      const qualityMap = new Map<string, ClientQuality>();
+      for (const q of action.qualities) {
+        qualityMap.set(q.userId, q);
+      }
+      const participants = state.participants.map((p) => {
+        const q = qualityMap.get(p.id);
+        if (!q) return p;
+        return {
+          ...p,
+          quality: q.quality as Participant["quality"],
+          latencyMs: q.latencyMs,
+          lastPingAt: q.lastPingAt,
+          connected: q.isConnected,
+        };
+      });
+      return {
+        ...state,
+        participants,
+      };
+    }
     case "SET_QUEUE":
       return {
         ...state,
@@ -407,6 +443,19 @@ export function useRoomBootstrap(
   const redirectGuardRef = useRef(false);
   const transitionSourceRef = useRef<string>("init");
   const prevStateRef = useRef(state);
+  const qualityPollRef = useRef<number | null>(null);
+  const pingIntervalRef = useRef<number | null>(null);
+
+  const clearPollingIntervals = useCallback(() => {
+    if (qualityPollRef.current !== null) {
+      window.clearInterval(qualityPollRef.current);
+      qualityPollRef.current = null;
+    }
+    if (pingIntervalRef.current !== null) {
+      window.clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+  }, []);
 
   const dispatch = useCallback((action: BootstrapAction, source: string) => {
     transitionSourceRef.current = source;
@@ -494,7 +543,8 @@ export function useRoomBootstrap(
             const body = await r.json();
             if (body?.error) errorMessage = body.error;
           } catch {
-            if (r.status >= 500) errorMessage = "Server unavailable. Please try again later.";
+            if (r.status >= 500)
+              errorMessage = "Server unavailable. Please try again later.";
           }
           throw new Error(errorMessage);
         }
@@ -589,6 +639,17 @@ export function useRoomBootstrap(
           }
           break;
         }
+        case "participant_disconnected": {
+          const payload = isRecord(message) ? message.participant : null;
+          const participantId = isRecord(payload) ? safeString(payload.id) : "";
+          if (participantId) {
+            dispatch(
+              { type: "PARTICIPANT_DISCONNECTED", participantId },
+              "ws_participant_disconnected",
+            );
+          }
+          break;
+        }
 
         case "queue_updated": {
           const queuePayload = isRecord(message) ? message.queue : [];
@@ -640,6 +701,39 @@ export function useRoomBootstrap(
           dispatch({ type: "WS_CONNECTED" }, "ws_connected");
           break;
         }
+
+        case "room_quality": {
+          const payload = message as { participants?: unknown };
+          if (Array.isArray(payload.participants)) {
+            const qualities = payload.participants
+              .filter(isRecord)
+              .map((q) => ({
+                userId: safeString(q.userId),
+                nickname: safeString(q.nickname),
+                latencyMs: safeNumber(q.latencyMs, 0),
+                jitterMs: safeNumber(q.jitterMs, 0),
+                packetLossPercent: safeNumber(q.packetLossPercent, 0),
+                quality: safeString(
+                  q.quality,
+                  "unknown",
+                ) as ClientQuality["quality"],
+                lastPingAt: safeString(q.lastPingAt),
+                isConnected: safeBool(q.isConnected, false),
+              }));
+            if (qualities.length > 0) {
+              dispatch(
+                { type: "UPDATE_PARTICIPANT_QUALITY", qualities },
+                "ws_room_quality",
+              );
+            }
+          }
+          break;
+        }
+
+        case "pong": {
+          // Pong received — latency is measured server-side via quality tracker
+          break;
+        }
       }
     };
 
@@ -671,6 +765,28 @@ export function useRoomBootstrap(
         reconnectDelayRef.current = 1000;
         dispatch({ type: "WS_CONNECTED" }, "ws_open");
         socket.send(JSON.stringify({ type: "get_state", payload: {} }));
+
+        // Fetch quality immediately so we don't wait for the first interval tick
+        socket.send(JSON.stringify({ type: "get_quality", payload: {} }));
+
+        // Poll quality every 10s to keep latency display up to date
+        qualityPollRef.current = window.setInterval(() => {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify({ type: "get_quality", payload: {} }));
+          }
+        }, QUALITY_POLL_INTERVAL_MS);
+
+        // Send app-level ping every 10s so backend can measure our latency
+        pingIntervalRef.current = window.setInterval(() => {
+          if (socket.readyState === WebSocket.OPEN) {
+            socket.send(
+              JSON.stringify({
+                type: "ping",
+                payload: { timestamp: new Date().toISOString() },
+              }),
+            );
+          }
+        }, PING_INTERVAL_MS);
       };
 
       socket.onmessage = (event) => {
@@ -703,6 +819,7 @@ export function useRoomBootstrap(
 
       socket.onerror = () => {
         if (seq !== connectionSeqRef.current) return;
+        clearPollingIntervals();
         dispatch(
           { type: "WS_DISCONNECTED", error: "Realtime connection error" },
           "ws_error_event",
@@ -712,6 +829,7 @@ export function useRoomBootstrap(
       socket.onclose = () => {
         if (seq !== connectionSeqRef.current) return;
         if (wsRef.current === socket) wsRef.current = null;
+        clearPollingIntervals();
         if (!shouldReconnectRef.current) return;
         dispatch(
           {
@@ -737,6 +855,7 @@ export function useRoomBootstrap(
     return () => {
       shouldReconnectRef.current = false;
       connectionSeqRef.current += 1;
+      clearPollingIntervals();
       if (reconnectTimeoutRef.current !== null) {
         window.clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;

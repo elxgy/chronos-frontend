@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { YouTubePlayer } from 'react-youtube';
-import { Loader2, AlertCircle, X } from 'lucide-react';
-import { cn } from '@/utils/helpers';
-import { Header, MainLayout } from '@/components/layout';
-import { VideoPlayer, Queue, ParticipantList, RoomControls } from '@/components/room';
-import { Button, ConfirmModal } from '@/components/common';
-import { useRoomBootstrap } from '@/hooks/useRoomBootstrap';
+import React, { useState } from "react";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { YouTubePlayer } from "react-youtube";
+import { Loader2, AlertCircle, X } from "lucide-react";
+import { cn } from "@/utils/helpers";
+import { Header, MainLayout } from "@/components/layout";
+import {
+  VideoPlayer,
+  Queue,
+  ParticipantList,
+  RoomControls,
+} from "@/components/room";
+import { Button, ConfirmModal } from "@/components/common";
+import { useRoomBootstrap } from "@/hooks/useRoomBootstrap";
 
 export const RoomPage: React.FC = () => {
   const { code } = useParams<{ code: string }>();
@@ -27,7 +32,9 @@ export const RoomPage: React.FC = () => {
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
   const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<'queue' | 'participants'>('queue');
+  const [sidebarTab, setSidebarTab] = useState<"queue" | "participants">(
+    "queue",
+  );
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const onLeaveClick = () => setShowLeaveConfirm(true);
@@ -57,49 +64,59 @@ export const RoomPage: React.FC = () => {
 
   const handleSeek = (time: number) => {
     sendMessage({
-      type: 'control',
-      payload: { type: 'seek', payload: { targetTime: time } },
+      type: "control",
+      payload: { type: "seek", payload: { targetTime: time } },
     });
   };
 
   const handleSkip = () => {
-    sendMessage({ type: 'control', payload: { type: 'skip' } });
+    sendMessage({ type: "control", payload: { type: "skip" } });
   };
 
   const handleAddVideo = async (videoId: string) => {
-    sendMessage({ type: 'add_video', payload: { videoId } });
+    sendMessage({ type: "add_video", payload: { videoId } });
   };
 
   const handleAddPlaylist = (playlistId: string) => {
-    sendMessage({ type: 'add_playlist', payload: { playlistId } });
+    sendMessage({ type: "add_playlist", payload: { playlistId } });
   };
 
   const handleRemoveVideo = (videoId: string) => {
-    sendMessage({ type: 'remove_video', payload: { videoId } });
+    sendMessage({ type: "remove_video", payload: { videoId } });
   };
 
   const handleReorder = (fromIndex: number, toIndex: number) => {
-    sendMessage({ type: 'reorder_queue', payload: { fromIndex, toIndex } });
+    sendMessage({ type: "reorder_queue", payload: { fromIndex, toIndex } });
   };
 
   const handlePlay = () => {
-    sendMessage({ type: 'control', payload: { type: 'play' } });
+    sendMessage({ type: "control", payload: { type: "play" } });
   };
 
   const handlePause = () => {
-    sendMessage({ type: 'control', payload: { type: 'pause' } });
+    sendMessage({ type: "control", payload: { type: "pause" } });
   };
 
   const handleSetAutoplay = (enabled: boolean) => {
-    sendMessage({ type: 'control', payload: { type: 'set_autoplay', payload: { enabled } } });
+    sendMessage({
+      type: "control",
+      payload: { type: "set_autoplay", payload: { enabled } },
+    });
   };
 
   const handleSetLoop = (enabled: boolean) => {
-    sendMessage({ type: 'control', payload: { type: 'set_loop', payload: { enabled } } });
+    sendMessage({
+      type: "control",
+      payload: { type: "set_loop", payload: { enabled } },
+    });
   };
 
   const handleClearQueue = () => {
-    sendMessage({ type: 'clear_queue', payload: {} });
+    sendMessage({ type: "clear_queue", payload: {} });
+  };
+
+  const handleShuffleQueue = () => {
+    sendMessage({ type: "control", payload: { type: "shuffle_queue" } });
   };
 
   const handleSeekBack10 = () => {
@@ -108,8 +125,8 @@ export const RoomPage: React.FC = () => {
     }
     const target = Math.max(0, roomState.currentTime - 10);
     sendMessage({
-      type: 'control',
-      payload: { type: 'seek', payload: { targetTime: target } },
+      type: "control",
+      payload: { type: "seek", payload: { targetTime: target } },
     });
   };
 
@@ -120,14 +137,17 @@ export const RoomPage: React.FC = () => {
     const duration = roomState.currentVideo.duration;
     const target = Math.min(duration, roomState.currentTime + 10);
     sendMessage({
-      type: 'control',
-      payload: { type: 'seek', payload: { targetTime: target } },
+      type: "control",
+      payload: { type: "seek", payload: { targetTime: target } },
     });
   };
 
   if (!code) {
     return (
-      <MainLayout className="min-h-screen flex items-center justify-center" maxWidth="full">
+      <MainLayout
+        className="min-h-screen flex items-center justify-center"
+        maxWidth="full"
+      >
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
           <p className="text-dark-400">Redirecting to home...</p>
@@ -136,9 +156,12 @@ export const RoomPage: React.FC = () => {
     );
   }
 
-  if (phase === 'initial' || phase === 'bootstrapping') {
+  if (phase === "initial" || phase === "bootstrapping") {
     return (
-      <MainLayout className="min-h-screen flex items-center justify-center" maxWidth="full">
+      <MainLayout
+        className="min-h-screen flex items-center justify-center"
+        maxWidth="full"
+      >
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="w-10 h-10 text-primary-400 animate-spin" />
           <p className="text-dark-300 font-medium">Connecting to room...</p>
@@ -148,21 +171,26 @@ export const RoomPage: React.FC = () => {
     );
   }
 
-  if (phase === 'fatal') {
+  if (phase === "fatal") {
     return (
-      <MainLayout className="min-h-screen flex items-center justify-center" maxWidth="full">
+      <MainLayout
+        className="min-h-screen flex items-center justify-center"
+        maxWidth="full"
+      >
         <div className="w-full max-w-md p-6 card">
           <div className="flex flex-col items-center gap-4 text-center">
             <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center">
               <AlertCircle className="w-7 h-7 text-red-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-dark-100 mb-1">Could not load room</h2>
+              <h2 className="text-lg font-semibold text-dark-100 mb-1">
+                Could not load room
+              </h2>
               <p className="text-dark-400 text-sm">{loadError}</p>
             </div>
             <Button
               variant="primary"
-              onClick={() => navigate('/')}
+              onClick={() => navigate("/")}
               className="min-h-[44px] px-6"
             >
               Back to home
@@ -174,7 +202,7 @@ export const RoomPage: React.FC = () => {
   }
 
   const isHost = session?.isHost ?? false;
-  const participantId = session?.participantId ?? '';
+  const participantId = session?.participantId ?? "";
 
   return (
     <div className="min-h-screen bg-dark-950 flex flex-col">
@@ -193,7 +221,7 @@ export const RoomPage: React.FC = () => {
         cancelText="Stay"
         variant="danger"
       />
-      {phase === 'recovering' && (
+      {phase === "recovering" && (
         <div className="flex items-center gap-2 px-4 py-3 text-sm text-yellow-300 bg-yellow-500/10 border-b border-yellow-500/20 shrink-0">
           <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
           <span>Realtime disconnected, reconnecting...</span>
@@ -210,8 +238,8 @@ export const RoomPage: React.FC = () => {
         <div className="flex-1 min-w-0 overflow-auto p-3 sm:p-4 md:p-6 flex flex-col">
           <div
             className={cn(
-              'mx-auto w-full transition-all duration-300',
-              showSidebar ? 'max-w-5xl' : 'max-w-7xl'
+              "mx-auto w-full transition-all duration-300",
+              showSidebar ? "max-w-5xl" : "max-w-7xl",
             )}
           >
             <VideoPlayer
@@ -271,31 +299,31 @@ export const RoomPage: React.FC = () => {
 
         <aside
           className={cn(
-            'border-l border-dark-700 bg-dark-900/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0',
+            "border-l border-dark-700 bg-dark-900/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0",
             showSidebar
-              ? 'fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-96 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96'
-              : 'hidden'
+              ? "fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-96 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96"
+              : "hidden",
           )}
         >
           <div className="flex items-center border-b border-dark-700 shrink-0">
             <button
-              onClick={() => setSidebarTab('queue')}
+              onClick={() => setSidebarTab("queue")}
               className={cn(
-                'flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation',
-                sidebarTab === 'queue'
-                  ? 'text-primary-400 border-b-2 border-primary-400 bg-primary-500/5'
-                  : 'text-dark-400 hover:text-dark-200 hover:bg-dark-800/50'
+                "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
+                sidebarTab === "queue"
+                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
+                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
               )}
             >
               Queue ({roomState.queue.length})
             </button>
             <button
-              onClick={() => setSidebarTab('participants')}
+              onClick={() => setSidebarTab("participants")}
               className={cn(
-                'flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation',
-                sidebarTab === 'participants'
-                  ? 'text-primary-400 border-b-2 border-primary-400 bg-primary-500/5'
-                  : 'text-dark-400 hover:text-dark-200 hover:bg-dark-800/50'
+                "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
+                sidebarTab === "participants"
+                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
+                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
               )}
             >
               People ({participants.length})
@@ -310,13 +338,14 @@ export const RoomPage: React.FC = () => {
           </div>
 
           <div className="flex-1 min-h-0 overflow-hidden">
-            {sidebarTab === 'queue' ? (
+            {sidebarTab === "queue" ? (
               <Queue
                 videos={roomState.queue}
                 currentVideoId={roomState.currentVideo?.id}
                 isHost={isHost}
                 autoplay={roomState.autoplay ?? false}
                 onSetAutoplay={handleSetAutoplay}
+                onShuffle={handleShuffleQueue}
                 onClearQueue={handleClearQueue}
                 onAddVideo={handleAddVideo}
                 onAddPlaylist={handleAddPlaylist}
@@ -345,7 +374,7 @@ export const RoomPage: React.FC = () => {
         {showSidebar && (
           <div
             className="fixed inset-0 z-20 bg-dark-950/60 backdrop-blur-sm lg:hidden"
-            style={{ top: 'var(--header-height)' }}
+            style={{ top: "var(--header-height)" }}
             onClick={() => setShowSidebar(false)}
             aria-hidden="true"
           />

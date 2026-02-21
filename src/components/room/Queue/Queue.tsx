@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   ListMusic,
   Plus,
@@ -7,10 +7,11 @@ import {
   Clock,
   PlayCircle,
   Repeat,
-} from 'lucide-react';
-import { cn, formatDuration, parseYouTubeInput } from '@/utils/helpers';
-import { Button, Input, Card, ConfirmModal } from '@/components/common';
-import { Video } from '@/types';
+  Shuffle,
+} from "lucide-react";
+import { cn, formatDuration, parseYouTubeInput } from "@/utils/helpers";
+import { Button, Input, Card, ConfirmModal } from "@/components/common";
+import { Video } from "@/types";
 
 interface QueueProps {
   videos: Video[];
@@ -18,6 +19,7 @@ interface QueueProps {
   isHost: boolean;
   autoplay?: boolean;
   onSetAutoplay?: (enabled: boolean) => void;
+  onShuffle?: () => void;
   onClearQueue?: () => void;
   onAddVideo: (videoId: string) => void;
   onAddPlaylist?: (playlistId: string) => void;
@@ -32,6 +34,7 @@ export const Queue: React.FC<QueueProps> = ({
   isHost,
   autoplay = false,
   onSetAutoplay,
+  onShuffle,
   onClearQueue,
   onAddVideo,
   onAddPlaylist,
@@ -39,15 +42,16 @@ export const Queue: React.FC<QueueProps> = ({
   onReorder,
   onVideoClick,
 }) => {
-  const [newVideoUrl, setNewVideoUrl] = useState('');
+  const [newVideoUrl, setNewVideoUrl] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [justShuffled, setJustShuffled] = useState(false);
 
   const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
 
-    setError('');
+    setError("");
     const parsed = parseYouTubeInput(newVideoUrl);
 
     if (parsed.playlistId) {
@@ -55,9 +59,9 @@ export const Queue: React.FC<QueueProps> = ({
       setIsAdding(true);
       try {
         onAddPlaylist(parsed.playlistId);
-        setNewVideoUrl('');
+        setNewVideoUrl("");
       } catch (err) {
-        setError('Failed to add playlist');
+        setError("Failed to add playlist");
       } finally {
         setIsAdding(false);
       }
@@ -68,25 +72,25 @@ export const Queue: React.FC<QueueProps> = ({
       setIsAdding(true);
       try {
         await onAddVideo(parsed.videoId);
-        setNewVideoUrl('');
+        setNewVideoUrl("");
       } catch (err) {
-        setError('Failed to add video');
+        setError("Failed to add video");
       } finally {
         setIsAdding(false);
       }
       return;
     }
 
-    setError('Invalid YouTube URL, video ID, or playlist link');
+    setError("Invalid YouTube URL, video ID, or playlist link");
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData('dragIndex', index.toString());
+    e.dataTransfer.setData("dragIndex", index.toString());
   };
 
   const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'), 10);
+    const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"), 10);
     if (dragIndex !== index) {
       onReorder(dragIndex, index);
     }
@@ -102,22 +106,42 @@ export const Queue: React.FC<QueueProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 mb-4 min-w-0">
-          {isHost && onSetAutoplay && (
-            <button
-              onClick={() => onSetAutoplay(!autoplay)}
-              className={cn(
-                'flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0',
-                autoplay
-                  ? 'bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30'
-                  : 'bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300'
-              )}
-              title={autoplay ? 'Autoplay on' : 'Autoplay off'}
-              aria-label={autoplay ? 'Autoplay on' : 'Autoplay off'}
-            >
-              <Repeat className="w-3.5 h-3.5" />
-              Autoplay
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {isHost && onSetAutoplay && (
+              <button
+                onClick={() => onSetAutoplay(!autoplay)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0",
+                  autoplay
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30"
+                    : "bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300",
+                )}
+                title={autoplay ? "Autoplay on" : "Autoplay off"}
+                aria-label={autoplay ? "Autoplay on" : "Autoplay off"}
+              >
+                <Repeat className="w-3.5 h-3.5" />
+                Autoplay
+              </button>
+            )}
+            {isHost && onShuffle && videos.length > 1 && (
+              <button
+                onClick={() => {
+                  setJustShuffled(true);
+                  onShuffle();
+                  setTimeout(() => setJustShuffled(false), 400);
+                }}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300",
+                  justShuffled && "ring-2 ring-primary-400 shadow-lg shadow-primary-500/50",
+                )}
+                title="Shuffle queue"
+                aria-label="Shuffle queue"
+              >
+                <Shuffle className="w-3.5 h-3.5" />
+                Shuffle
+              </button>
+            )}
+          </div>
           {isHost && onClearQueue && videos.length > 0 && (
             <button
               onClick={() => setShowClearConfirm(true)}
@@ -182,8 +206,8 @@ export const Queue: React.FC<QueueProps> = ({
               <li
                 key={`${video.id}-${index}`}
                 className={cn(
-                  'p-3 hover:bg-dark-700/50 transition-colors group',
-                  currentVideoId === video.id && 'bg-primary-500/10'
+                  "p-3 hover:bg-dark-700/50 transition-colors group",
+                  currentVideoId === video.id && "bg-primary-500/10",
                 )}
                 draggable={isHost}
                 onDragStart={(e) => handleDragStart(e, index)}
