@@ -69,6 +69,7 @@ type BootstrapAction =
   | { type: "SET_STATE_SYNC"; roomState: RoomState }
   | { type: "SET_PARTICIPANTS"; participants: Participant[] }
   | { type: "PARTICIPANT_JOINED"; participant: Participant }
+  | { type: "PARTICIPANT_RECONNECTED"; participant: Participant }
   | { type: "PARTICIPANT_LEFT"; participantId: string }
   | { type: "PARTICIPANT_DISCONNECTED"; participantId: string }
   | { type: "SET_QUEUE"; queue: Video[] }
@@ -289,6 +290,40 @@ function bootstrapReducer(
         return state;
       }
       const participants = [...state.participants, action.participant];
+      return {
+        ...state,
+        participants,
+        roomState: {
+          ...state.roomState,
+          participantCount: participants.length,
+        },
+        lastAppliedVersion: state.lastAppliedVersion,
+      };
+    }
+    case "PARTICIPANT_RECONNECTED": {
+      const existing = state.participants.find(
+        (p) => p.id === action.participant.id,
+      );
+      if (existing) {
+        const participants = state.participants.map((p) =>
+          p.id === action.participant.id
+            ? {
+                ...p,
+                ...action.participant,
+                connected: true,
+                isActive: true,
+              }
+            : p,
+        );
+        return {
+          ...state,
+          participants,
+        };
+      }
+      const participants = [
+        ...state.participants,
+        { ...action.participant, connected: true, isActive: true },
+      ];
       return {
         ...state,
         participants,
@@ -624,6 +659,19 @@ export function useRoomBootstrap(
             dispatch(
               { type: "PARTICIPANT_JOINED", participant },
               "ws_participant_joined",
+            );
+          }
+          break;
+        }
+        case "participant_reconnected": {
+          const payload = isRecord(message) ? message.participant : null;
+          const participant = normalizeParticipants(
+            payload ? [payload] : [],
+          )[0];
+          if (participant) {
+            dispatch(
+              { type: "PARTICIPANT_RECONNECTED", participant },
+              "ws_participant_reconnected",
             );
           }
           break;

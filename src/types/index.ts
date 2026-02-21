@@ -149,7 +149,11 @@ export interface ErrorMessage {
 }
 
 export interface ParticipantEvent {
-  type: "participant_joined" | "participant_left" | "participant_disconnected";
+  type:
+    | "participant_joined"
+    | "participant_reconnected"
+    | "participant_left"
+    | "participant_disconnected";
   participant: Participant;
 }
 
