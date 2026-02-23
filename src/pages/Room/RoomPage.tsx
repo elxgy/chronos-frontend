@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { YouTubePlayer } from "react-youtube";
 import { Loader2, AlertCircle, X } from "lucide-react";
 import { cn } from "@/utils/helpers";
 import { Header, MainLayout } from "@/components/layout";
@@ -30,7 +29,6 @@ export const RoomPage: React.FC = () => {
   } = useRoomBootstrap(code, location.state, navigate);
 
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
-  const [player, setPlayer] = useState<YouTubePlayer | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<"queue" | "participants">(
     "queue",
@@ -41,25 +39,6 @@ export const RoomPage: React.FC = () => {
   const onLeaveConfirm = () => {
     setShowLeaveConfirm(false);
     handleLeave();
-  };
-
-  const handlePlayerReady = (playerInstance: YouTubePlayer) => {
-    setPlayer(playerInstance);
-  };
-
-  const handlePlayerStateChange = (playerState: number) => {
-    if (playerState === 1 && player && roomState.currentVideo) {
-      try {
-        const localTime = player.getCurrentTime();
-        const targetTime = roomState.currentTime;
-        const drift = localTime - targetTime;
-        if (drift > 0 || drift < -1) {
-          player.seekTo(targetTime, true);
-        }
-      } catch {
-        // Player may be stale (e.g. video switched)
-      }
-    }
   };
 
   const handleSeek = (time: number) => {
@@ -248,8 +227,6 @@ export const RoomPage: React.FC = () => {
               stateVersion={roomState.stateVersion}
               isPlaying={roomState.isPlaying}
               isHost={isHost}
-              onReady={handlePlayerReady}
-              onStateChange={handlePlayerStateChange}
               onSeek={handleSeek}
               onSkip={handleSkip}
               onPlay={handlePlay}

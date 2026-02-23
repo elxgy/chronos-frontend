@@ -1,13 +1,22 @@
-import React, { useEffect, useRef, useState } from 'react';
-import YouTube, { YouTubePlayer } from 'react-youtube';
-import { Play, Pause, Volume1, Volume2, VolumeX, Maximize, Minimize, SkipForward } from 'lucide-react';
-import { Video } from '@/types';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import YouTube, { YouTubeEvent, YouTubePlayer } from "react-youtube";
+import {
+  Play,
+  Pause,
+  Volume1,
+  Volume2,
+  VolumeX,
+  Maximize,
+  Minimize,
+  SkipForward,
+} from "lucide-react";
+import { Video } from "@/types";
 
-const VOLUME_STORAGE_KEY = 'chronos-volume';
+const VOLUME_STORAGE_KEY = "chronos-volume";
 
 function loadStoredVolume(): number {
   try {
-    const v = parseInt(localStorage.getItem(VOLUME_STORAGE_KEY) ?? '100', 10);
+    const v = parseInt(localStorage.getItem(VOLUME_STORAGE_KEY) ?? "100", 10);
     return Number.isFinite(v) ? Math.max(0, Math.min(100, v)) : 100;
   } catch {
     return 100;
@@ -20,8 +29,8 @@ interface VideoPlayerProps {
   stateVersion: number;
   isPlaying: boolean;
   isHost: boolean;
-  onReady: (player: YouTubePlayer) => void;
-  onStateChange: (state: number) => void;
+  onReady?: (player: YouTubePlayer) => void;
+  onStateChange?: (state: number) => void;
   onSeek: (time: number) => void;
   onSkip: () => void;
   onPlay: () => void;
@@ -34,8 +43,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   stateVersion,
   isPlaying,
   isHost,
-  onReady,
-  onStateChange,
+  onReady = () => {},
+  onStateChange = () => {},
   onSeek,
   onSkip,
   onPlay,
@@ -46,12 +55,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const currentTimeRef = useRef(currentTime);
   const isPlayingRef = useRef(isPlaying);
   const stateVersionRef = useRef(stateVersion);
-  const transitionKeyRef = useRef('');
+  const transitionKeyRef = useRef("");
   const pauseEnforceUntilRef = useRef(0);
   const lastNonZeroVolumeRef = useRef(100);
+  const videoRef = useRef(video);
+  videoRef.current = video;
+  const stablePlayerVideoIdRef = useRef<string | null>(null);
+  const prevVideoIdRef = useRef<string | null>(null);
+
   currentTimeRef.current = currentTime;
   isPlayingRef.current = isPlaying;
   stateVersionRef.current = stateVersion;
+
   const [volume, setVolume] = useState(loadStoredVolume);
   const [showControls, setShowControls] = useState(true);
   const [seekingTime, setSeekingTime] = useState<number | null>(null);
@@ -59,31 +74,53 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isFullscreen, setIsFullscreen] = useState(false);
   seekingTimeRef.current = seekingTime;
 
+  const opts = useMemo(
+    () => ({
+      width: "100%",
+      height: "100%",
+      playerVars: {
+        autoplay: 0,
+        controls: 0,
+        disablekb: 1,
+        modestbranding: 1,
+        rel: 0,
+        enablejsapi: 1,
+        origin: window.location.origin,
+        fs: 0,
+        iv_load_policy: 3,
+      },
+    }),
+    [],
+  );
+
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
     };
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () =>
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
   const formatTime = (seconds: number): string => {
     const safe = Math.max(0, Math.floor(seconds));
     const mins = Math.floor(safe / 60);
     const secs = safe % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const duration = video?.duration ?? 0;
-  const progressTime = seekingTime ?? (isHost && isPlaying ? hostDisplayTime : currentTime);
+  const progressTime =
+    seekingTime ?? (isHost && isPlaying ? hostDisplayTime : currentTime);
   const sliderMax = duration > 0 ? duration : 1;
 
   const DRIFT_TOLERANCE_SEC = 1;
   const PAUSE_SYNC_TOLERANCE_SEC = 0.2;
+
   const applySyncCorrection = (
     player: YouTubePlayer,
     targetTime: number,
-    tolerance = DRIFT_TOLERANCE_SEC
+    tolerance = DRIFT_TOLERANCE_SEC,
   ) => {
     const localTime = player.getCurrentTime();
     const drift = localTime - targetTime;
@@ -93,7 +130,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const applyAuthoritativeState = (strict = false) => {
-    if (!playerRef.current || !video) {
+    if (!playerRef.current || !videoRef.current) {
       return;
     }
     const targetTime = currentTimeRef.current;
@@ -117,9 +154,26 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   useEffect(() => {
     setSeekingTime(null);
     setHostDisplayTime(currentTime);
-    return () => {
+
+    if (!video) {
+      stablePlayerVideoIdRef.current = null;
+      prevVideoIdRef.current = null;
       playerRef.current = null;
-    };
+      return;
+    }
+
+    const isFirstMount = prevVideoIdRef.current === null;
+    const videoChanged = !isFirstMount && prevVideoIdRef.current !== video.id;
+
+    if (videoChanged && playerRef.current) {
+      transitionKeyRef.current = "";
+      playerRef.current.loadVideoById({
+        videoId: video.id,
+        startSeconds: currentTimeRef.current,
+      });
+    }
+
+    prevVideoIdRef.current = video.id;
   }, [video?.id]);
 
   useEffect(() => {
@@ -132,14 +186,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!playerRef.current || seekingTime !== null) {
       return;
     }
-    applySyncCorrection(playerRef.current, currentTime, isPlaying ? DRIFT_TOLERANCE_SEC : PAUSE_SYNC_TOLERANCE_SEC);
+    applySyncCorrection(
+      playerRef.current,
+      currentTime,
+      isPlaying ? DRIFT_TOLERANCE_SEC : PAUSE_SYNC_TOLERANCE_SEC,
+    );
   }, [currentTime, isPlaying, seekingTime]);
 
   useEffect(() => {
     if (seekingTime !== null) {
       return;
     }
-    const key = `${video?.id ?? ''}:${isPlaying ? '1' : '0'}:${stateVersionRef.current}`;
+    const key = `${video?.id ?? ""}:${isPlaying ? "1" : "0"}:${stateVersionRef.current}`;
     if (transitionKeyRef.current === key) {
       return;
     }
@@ -168,16 +226,45 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     applyAuthoritativeState(true);
   }, [isPlaying]);
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== "visible") {
+        return;
+      }
+      transitionKeyRef.current = "";
+      applyAuthoritativeState(true);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, []);
+
   const handleReady = (event: { target: YouTubePlayer }) => {
     playerRef.current = event.target;
+    stablePlayerVideoIdRef.current = videoRef.current?.id ?? null;
+    prevVideoIdRef.current = videoRef.current?.id ?? null;
+
+    const iframe = event.target.getIframe?.() as HTMLIFrameElement | undefined;
+    if (iframe) {
+      const existing = iframe.getAttribute("allow") ?? "";
+      if (!existing.includes("autoplay")) {
+        iframe.setAttribute(
+          "allow",
+          existing ? `${existing}; autoplay` : "autoplay",
+        );
+      }
+    }
+
     onReady(event.target);
     event.target.setVolume(volume);
     applyAuthoritativeState(true);
   };
 
-  const handleStateChange = (state: number) => {
+  const handleStateChange = (event: YouTubeEvent<number>) => {
+    const state = event.data;
     onStateChange(state);
-    if (state === -1 || state === 1 || state === 2 || state === 3 || state === 5) {
+    if (state === -1 || state === 2 || state === 5) {
       window.setTimeout(() => {
         if (seekingTimeRef.current !== null) {
           return;
@@ -199,9 +286,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (v > 0) lastNonZeroVolumeRef.current = v;
     try {
       localStorage.setItem(VOLUME_STORAGE_KEY, String(v));
-    } catch {
-      /* ignore */
-    }
+    } catch {}
   };
 
   const toggleMute = () => {
@@ -213,17 +298,13 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleFullscreen = () => {
-    const container = document.getElementById('video-container');
+    const container = document.getElementById("video-container");
     if (!container) return;
     if (document.fullscreenElement) {
       document.exitFullscreen?.();
     } else if (container.requestFullscreen) {
       container.requestFullscreen();
     }
-  };
-
-  const handleSkip = () => {
-    onSkip();
   };
 
   const commitSeek = () => {
@@ -242,22 +323,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setHostDisplayTime(target);
     onSeek(target);
     setSeekingTime(null);
-  };
-
-  const opts = {
-    width: '100%',
-    height: '100%',
-    playerVars: {
-      autoplay: 0,
-      controls: 0,
-      disablekb: 1,
-      modestbranding: 1,
-      rel: 0,
-      enablejsapi: 1,
-      origin: window.location.origin,
-      fs: 0,
-      iv_load_policy: 3,
-    },
   };
 
   const handleVideoAreaClick = () => {
@@ -290,6 +355,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     );
   }
 
+  const youtubeVideoId = stablePlayerVideoIdRef.current ?? video.id;
+
   return (
     <div
       id="video-container"
@@ -298,8 +365,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseLeave={() => setShowControls(false)}
     >
       <YouTube
-        key={video.id}
-        videoId={video.id}
+        videoId={youtubeVideoId}
         opts={opts}
         onReady={handleReady}
         onStateChange={handleStateChange}
@@ -310,19 +376,19 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         className="absolute inset-0 z-10 cursor-pointer flex items-center justify-center transition-colors"
         onClick={handleVideoAreaClick}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
+          if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleVideoAreaClick();
           }
         }}
         role="button"
         tabIndex={0}
-        aria-label={isPlaying ? 'Pause video' : 'Play video'}
+        aria-label={isPlaying ? "Pause video" : "Play video"}
       />
 
       <div
         className={`absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-dark-950/90 via-dark-950/50 to-transparent p-4 transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0'
+          showControls ? "opacity-100" : "opacity-0"
         }`}
       >
         <div className="mb-3">
@@ -352,10 +418,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                   onClick={isPlaying ? onPause : onPlay}
                   className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
                 >
-                  {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                  {isPlaying ? (
+                    <Pause className="w-5 h-5" />
+                  ) : (
+                    <Play className="w-5 h-5" />
+                  )}
                 </button>
                 <button
-                  onClick={handleSkip}
+                  onClick={onSkip}
                   className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
                 >
                   <SkipForward className="w-5 h-5" />
@@ -369,7 +439,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <button
                 onClick={toggleMute}
                 className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
-                aria-label={volume === 0 ? 'Unmute' : 'Mute'}
+                aria-label={volume === 0 ? "Unmute" : "Mute"}
               >
                 {volume === 0 ? (
                   <VolumeX className="w-5 h-5" />
@@ -392,7 +462,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <button
               onClick={handleFullscreen}
               className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
-              aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+              aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
                 <Minimize className="w-5 h-5" />
