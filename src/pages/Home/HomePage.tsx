@@ -16,7 +16,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <MainLayout className="flex flex-col items-center justify-center min-h-[80vh] px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-10 sm:mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-primary-500/20 border border-primary-500/30 mb-4">
             <Play className="w-8 h-8 sm:w-10 sm:h-10 text-primary-400" />

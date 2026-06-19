@@ -77,7 +77,7 @@ export const JoinRoomPage: React.FC = () => {
 
   return (
     <AuthLayout>
-      <Card className="w-full">
+      <Card className="w-full animate-fade-in">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate("/")}
