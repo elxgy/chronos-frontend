@@ -58,6 +58,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const transitionKeyRef = useRef("");
   const pauseEnforceUntilRef = useRef(0);
   const lastNonZeroVolumeRef = useRef(100);
+  const syncSettleUntilRef = useRef(0);
   const videoRef = useRef(video);
   videoRef.current = video;
   const stablePlayerVideoIdRef = useRef<string | null>(null);
@@ -114,8 +115,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     seekingTime ?? (isHost && isPlaying ? hostDisplayTime : currentTime);
   const sliderMax = duration > 0 ? duration : 1;
 
-  const DRIFT_TOLERANCE_SEC = 1;
-  const PAUSE_SYNC_TOLERANCE_SEC = 0.2;
+  const DRIFT_TOLERANCE_SEC = isHost ? 1 : 3;
+  const PAUSE_SYNC_TOLERANCE_SEC = isHost ? 0.2 : 1;
 
   const applySyncCorrection = (
     player: YouTubePlayer,
@@ -186,12 +187,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!playerRef.current || seekingTime !== null) {
       return;
     }
+    if (isHost) {
+      return;
+    }
+    if (Date.now() < syncSettleUntilRef.current) {
+      return;
+    }
     applySyncCorrection(
       playerRef.current,
       currentTime,
       isPlaying ? DRIFT_TOLERANCE_SEC : PAUSE_SYNC_TOLERANCE_SEC,
     );
-  }, [currentTime, isPlaying, seekingTime]);
+  }, [currentTime, isPlaying, seekingTime, isHost]);
 
   useEffect(() => {
     if (seekingTime !== null) {
@@ -203,6 +210,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
     transitionKeyRef.current = key;
     pauseEnforceUntilRef.current = isPlaying ? 0 : Date.now() + 5000;
+    syncSettleUntilRef.current = Date.now() + 1000;
     applyAuthoritativeState(true);
   }, [video?.id, isPlaying, stateVersion, seekingTime]);
 
@@ -217,10 +225,15 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         }
         return;
       }
-      applyAuthoritativeState(false);
-    }, 400);
+      if (isHost) {
+        const actualTime = playerRef.current.getCurrentTime();
+        setHostDisplayTime(actualTime);
+      } else {
+        applyAuthoritativeState(false);
+      }
+    }, 250);
     return () => window.clearInterval(id);
-  }, [video?.id]);
+  }, [video?.id, isHost]);
 
   useEffect(() => {
     applyAuthoritativeState(true);
