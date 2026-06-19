@@ -36,6 +36,7 @@ function buildHookResult(overrides: Partial<UseRoomBootstrapResult>): UseRoomBoo
     },
     roomState: baseRoomState,
     participants: [],
+    chatMessages: [],
     loadError: '',
     roomError: '',
     sendMessage: vi.fn(),
