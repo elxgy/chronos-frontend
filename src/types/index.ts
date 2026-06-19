@@ -175,6 +175,13 @@ export interface ChatHistoryEvent {
   messages: ChatMessage[];
 }
 
+export interface SearchResult {
+  id: string;
+  title: string;
+  thumbnail: string;
+  channel: string;
+}
+
 export interface ChatBroadcastEvent {
   type: "chat_message";
   messageId: string;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Play,
   Pause,
@@ -7,10 +7,13 @@ import {
   SkipForward,
   Plus,
   Repeat1,
+  Loader2,
 } from 'lucide-react';
 import { Button } from '@/components/common';
 import { Modal, Input } from '@/components/common';
 import { cn, parseYouTubeInput } from '@/utils/helpers';
+import { SearchResult } from '@/types';
+import { getApiUrl } from '@/config';
 
 interface RoomControlsProps {
   isHost: boolean;
@@ -155,8 +158,51 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
 }) => {
   const [videoUrl, setVideoUrl] = useState('');
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<number | null>(null);
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const response = await fetch(
+        getApiUrl(`/api/youtube/search?q=${encodeURIComponent(query)}`)
+      );
+      if (response.ok) {
+        const results = await response.json();
+        setSearchResults(results || []);
+      }
+    } catch {
+      // Search failed silently
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSearchInputChange = (value: string) => {
+    setSearchQuery(value);
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+    searchTimeoutRef.current = window.setTimeout(() => {
+      handleSearch(value);
+    }, 300);
+  };
 
   const handleAdd = () => {
+    if (searchQuery.trim() && searchResults.length === 0) {
+      setError('No search results. Try a different query or paste a URL.');
+      return;
+    }
+    if (!videoUrl.trim()) {
+      setError('Enter a YouTube URL or search for a video');
+      return;
+    }
     const parsed = parseYouTubeInput(videoUrl);
     if (parsed.playlistId && onAddPlaylist) {
       onAddPlaylist(parsed.playlistId);
@@ -176,29 +222,50 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title="Add Video"
-      description="Paste a YouTube URL, video ID, or playlist link"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Add Video" description="Search YouTube or paste a URL">
       <div className="space-y-4">
         <Input
-          placeholder="https://youtube.com/watch?v=... or playlist link"
-          value={videoUrl}
+          placeholder="Search YouTube or paste URL..."
+          value={searchQuery}
           onChange={(e) => {
-            setVideoUrl(e.target.value);
+            handleSearchInputChange(e.target.value);
             setError('');
           }}
           error={error}
         />
+
+        {searchResults.length > 0 && (
+          <div className="border border-dark-600 rounded-lg max-h-48 overflow-y-auto">
+            {searchResults.map((result) => (
+              <button
+                key={result.id}
+                onClick={() => {
+                  onAddVideo(result.id);
+                  setSearchQuery('');
+                  setSearchResults([]);
+                  onClose();
+                }}
+                className="w-full flex items-center gap-3 p-2 hover:bg-dark-700/50 transition-colors text-left"
+              >
+                <img src={result.thumbnail} alt="" className="w-16 h-10 object-cover rounded" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-dark-200 truncate">{result.title}</p>
+                  <p className="text-xs text-dark-500">{result.channel}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {isSearching && (
+          <div className="flex items-center justify-center py-4">
+            <Loader2 className="w-5 h-5 text-primary-400 animate-spin" />
+          </div>
+        )}
+
         <div className="flex justify-end gap-3">
-          <Button variant="secondary" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button variant="primary" onClick={handleAdd}>
-            Add Video
-          </Button>
+          <Button variant="secondary" onClick={onClose}>Cancel</Button>
+          <Button variant="primary" onClick={handleAdd} disabled={!searchQuery.trim()}>Add</Button>
         </div>
       </div>
     </Modal>
