@@ -161,3 +161,25 @@ export interface QueueUpdateEvent {
   type: "queue_updated";
   queue: Video[];
 }
+
+export interface ChatMessage {
+  messageId: string;
+  userId: UserID;
+  nickname: string;
+  text: string;
+  timestamp: string;
+}
+
+export interface ChatHistoryEvent {
+  type: "chat_history";
+  messages: ChatMessage[];
+}
+
+export interface ChatBroadcastEvent {
+  type: "chat_message";
+  messageId: string;
+  userId: string;
+  nickname: string;
+  text: string;
+  timestamp: string;
+}
