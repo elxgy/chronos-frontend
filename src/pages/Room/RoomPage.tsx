@@ -379,7 +379,7 @@ export const RoomPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
             {sidebarTab === "queue" ? (
               <Queue
                 videos={roomState.queue}
