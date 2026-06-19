@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useRef, useCallback } from "react";
 import { NavigateFunction } from "react-router-dom";
-import { RoomState, Video, Participant, ClientQuality } from "@/types";
+import { RoomState, Video, Participant, ClientQuality, ChatMessage } from "@/types";
 import { getApiUrl, getWsUrl } from "@/config";
 
 const STORAGE_KEY = "chronos-session";
@@ -47,6 +47,7 @@ type BootstrapState = {
   session: RoomSession | null;
   roomState: RoomState;
   participants: Participant[];
+  chatMessages: ChatMessage[];
   loadError: string;
   roomError: string;
   lastAppliedVersion: number;
@@ -73,7 +74,9 @@ type BootstrapAction =
   | { type: "PARTICIPANT_LEFT"; participantId: string }
   | { type: "PARTICIPANT_DISCONNECTED"; participantId: string }
   | { type: "SET_QUEUE"; queue: Video[] }
-  | { type: "UPDATE_PARTICIPANT_QUALITY"; qualities: ClientQuality[] };
+  | { type: "UPDATE_PARTICIPANT_QUALITY"; qualities: ClientQuality[] }
+  | { type: "ADD_CHAT_MESSAGE"; message: ChatMessage }
+  | { type: "SET_CHAT_HISTORY"; messages: ChatMessage[] };
 
 const initialBootstrapState: BootstrapState = {
   phase: "initial",
@@ -81,6 +84,7 @@ const initialBootstrapState: BootstrapState = {
   session: null,
   roomState: initialRoomState,
   participants: [],
+  chatMessages: [],
   loadError: "",
   roomError: "",
   lastAppliedVersion: 0,
@@ -224,6 +228,7 @@ function bootstrapReducer(
         session: null,
         roomState: initialRoomState,
         participants: [],
+        chatMessages: [],
         loadError: "",
         roomError: "",
         lastAppliedVersion: 0,
@@ -237,6 +242,7 @@ function bootstrapReducer(
         session: action.session,
         roomState: action.roomState,
         participants: action.participants,
+        chatMessages: [],
         loadError: "",
         roomError: "",
         lastAppliedVersion: action.roomState.stateVersion ?? 0,
@@ -388,6 +394,10 @@ function bootstrapReducer(
         },
         lastAppliedVersion: state.lastAppliedVersion,
       };
+    case "ADD_CHAT_MESSAGE":
+      return { ...state, chatMessages: [...state.chatMessages, action.message] };
+    case "SET_CHAT_HISTORY":
+      return { ...state, chatMessages: action.messages };
     default:
       return state;
   }
@@ -447,6 +457,7 @@ export type UseRoomBootstrapResult = {
   session: RoomSession | null;
   roomState: RoomState;
   participants: Participant[];
+  chatMessages: ChatMessage[];
   loadError: string;
   roomError: string;
   sendMessage: (message: Record<string, unknown>) => void;
@@ -725,6 +736,7 @@ export function useRoomBootstrap(
           const payload = message as {
             participants?: unknown;
             currentState?: unknown;
+            chatHistory?: ChatMessage[];
           };
           if (payload.participants) {
             const nextParticipants = normalizeParticipants(
@@ -743,6 +755,12 @@ export function useRoomBootstrap(
             dispatch(
               { type: "SET_STATE_SYNC", roomState: nextRoomState },
               "ws_connected_state",
+            );
+          }
+          if (payload.chatHistory) {
+            dispatch(
+              { type: "SET_CHAT_HISTORY", messages: payload.chatHistory },
+              "ws_connected_chat",
             );
           }
           dispatch({ type: "WS_CONNECTED" }, "ws_connected");
@@ -779,6 +797,44 @@ export function useRoomBootstrap(
 
         case "pong": {
           // Pong received — latency is measured server-side via quality tracker
+          break;
+        }
+
+        case "chat_message": {
+          const payload = message as Record<string, unknown>;
+          const chatMsg: ChatMessage = {
+            messageId: safeString(payload.messageId),
+            userId: safeString(payload.userId),
+            nickname: safeString(payload.nickname),
+            text: safeString(payload.text),
+            timestamp: safeString(payload.timestamp),
+          };
+          if (chatMsg.messageId && chatMsg.text) {
+            dispatch(
+              { type: "ADD_CHAT_MESSAGE", message: chatMsg },
+              "ws_chat_message",
+            );
+          }
+          break;
+        }
+
+        case "chat_history": {
+          const payload = message as { messages?: unknown };
+          if (Array.isArray(payload.messages)) {
+            const messages: ChatMessage[] = payload.messages
+              .filter(isRecord)
+              .map((m) => ({
+                messageId: safeString(m.messageId),
+                userId: safeString(m.userId),
+                nickname: safeString(m.nickname),
+                text: safeString(m.text),
+                timestamp: safeString(m.timestamp),
+              }));
+            dispatch(
+              { type: "SET_CHAT_HISTORY", messages },
+              "ws_chat_history",
+            );
+          }
           break;
         }
       }
@@ -930,6 +986,7 @@ export function useRoomBootstrap(
     session: state.session,
     roomState: state.roomState,
     participants: state.participants,
+    chatMessages: state.chatMessages,
     loadError: state.loadError,
     roomError: state.roomError,
     sendMessage,
