@@ -8,6 +8,7 @@ import {
   Queue,
   ParticipantList,
   RoomControls,
+  Chat,
 } from "@/components/room";
 import { Button, ConfirmModal } from "@/components/common";
 import { useRoomBootstrap } from "@/hooks/useRoomBootstrap";
@@ -26,13 +27,14 @@ export const RoomPage: React.FC = () => {
     roomError,
     sendMessage,
     handleLeave,
+    chatMessages,
   } = useRoomBootstrap(code, location.state, navigate);
 
   const [showAddVideoModal, setShowAddVideoModal] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
-  const [sidebarTab, setSidebarTab] = useState<"queue" | "participants">(
-    "queue",
-  );
+  const [sidebarTab, setSidebarTab] = useState<
+    "queue" | "participants" | "chat"
+  >("queue");
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const isHost = session?.isHost ?? false;
@@ -43,6 +45,13 @@ export const RoomPage: React.FC = () => {
     setShowLeaveConfirm(false);
     handleLeave();
   };
+
+  const handleSendMessage = useCallback(
+    (text: string) => {
+      sendMessage({ type: "chat_message", payload: { text } });
+    },
+    [sendMessage],
+  );
 
   const handleSeek = useCallback((time: number) => {
     sendMessage({
@@ -306,6 +315,17 @@ export const RoomPage: React.FC = () => {
               People ({participants.length})
             </button>
             <button
+              onClick={() => setSidebarTab("chat")}
+              className={cn(
+                "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
+                sidebarTab === "chat"
+                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
+                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
+              )}
+            >
+              Chat
+            </button>
+            <button
               onClick={() => setShowSidebar(false)}
               className="p-3 text-dark-400 hover:text-dark-200 hover:bg-dark-800/50 transition-colors touch-manipulation shrink-0"
               aria-label="Hide panel"
@@ -329,11 +349,17 @@ export const RoomPage: React.FC = () => {
                 onRemoveVideo={handleRemoveVideo}
                 onReorder={handleReorder}
               />
-            ) : (
+            ) : sidebarTab === "participants" ? (
               <ParticipantList
                 participants={participants}
                 currentUserId={participantId}
                 isHost={isHost}
+              />
+            ) : (
+              <Chat
+                messages={chatMessages}
+                currentUserId={participantId}
+                onSendMessage={handleSendMessage}
               />
             )}
           </div>
