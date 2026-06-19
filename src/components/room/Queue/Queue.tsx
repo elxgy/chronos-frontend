@@ -48,6 +48,7 @@ export const Queue: React.FC<QueueProps> = ({
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [justShuffled, setJustShuffled] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [overIndex, setOverIndex] = useState<number | null>(null);
 
   const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
@@ -90,13 +91,17 @@ export const Queue: React.FC<QueueProps> = ({
     e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e: React.DragEvent, index: number) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
+    const rect = e.currentTarget.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    setOverIndex(e.clientY < midY ? index : index + 1);
   };
 
   const handleDrop = (e: React.DragEvent, index: number) => {
     e.preventDefault();
+    setOverIndex(null);
     if (dragIndex !== null && dragIndex !== index) {
       onReorder(dragIndex, index);
     }
@@ -105,6 +110,7 @@ export const Queue: React.FC<QueueProps> = ({
 
   const handleDragEnd = () => {
     setDragIndex(null);
+    setOverIndex(null);
   };
 
   return (
@@ -217,13 +223,19 @@ export const Queue: React.FC<QueueProps> = ({
               <li
                 key={`${video.id}-${index}`}
                 className={cn(
-                  "p-3 hover:bg-dark-700/50 transition-colors group animate-slide-up",
+                  "p-3 transition-all duration-150 group animate-slide-up",
+                  dragIndex === index
+                    ? "opacity-40 ring-2 ring-primary-400/50"
+                    : "hover:bg-dark-700/50",
                   currentVideoId === video.id && "bg-primary-500/10",
-                  dragIndex === index && "opacity-50",
+                  overIndex === index && dragIndex !== null && dragIndex !== index
+                    ? "border-t-2 border-primary-500"
+                    : "",
                 )}
                 draggable={isHost}
                 onDragStart={(e) => handleDragStart(e, index)}
-                onDragOver={handleDragOver}
+                onDragOver={(e) => handleDragOver(e, index)}
+                onDragLeave={() => setOverIndex(null)}
                 onDrop={(e) => handleDrop(e, index)}
                 onDragEnd={handleDragEnd}
                 onClick={() => onVideoClick?.(video)}
