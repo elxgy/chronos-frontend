@@ -56,7 +56,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             <button
               onClick={isPlaying ? onPause : onPlay}
               className={cn(
-                'min-w-[48px] min-h-[48px] p-4 rounded-lg transition-all duration-200 flex items-center justify-center touch-manipulation',
+                'control-btn duration-200',
                 isPlaying
                   ? 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
                   : 'bg-theme-accent hover:bg-theme-accent text-on-accent shadow-glow'
@@ -71,13 +71,13 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onSkip}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
+              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
             >
               <SkipForward className="w-6 h-6" />
             </button>
             <button
               onClick={onSeekBack10}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
+              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
               title="Go back 10 seconds"
               aria-label="Go back 10 seconds"
             >
@@ -85,7 +85,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             </button>
             <button
               onClick={onSeekForward10}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
+              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
               title="Skip forward 10 seconds"
               aria-label="Skip forward 10 seconds"
             >
@@ -95,7 +95,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             <button
               onClick={() => onSetLoop(!loop)}
               className={cn(
-                'min-w-[48px] min-h-[48px] p-4 rounded-lg transition-all flex items-center justify-center touch-manipulation',
+                'control-btn',
                 loop
                   ? 'bg-theme-accent hover:bg-theme-accent text-on-accent'
                   : 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
@@ -108,7 +108,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onOpenAddVideo}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
+              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
               aria-label="Add video"
             >
               <Plus className="w-6 h-6" />

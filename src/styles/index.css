@@ -74,6 +74,10 @@
     border: 2px solid var(--border);
     color: var(--text-primary);
   }
+
+  .control-btn {
+    @apply min-w-[48px] min-h-[48px] p-4 rounded-full transition-all flex items-center justify-center touch-manipulation;
+  }
   .input::placeholder {
     color: var(--text-muted);
   }

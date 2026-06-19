@@ -64,3 +64,7 @@ html.theme-midnight .header-bar {
   backdrop-filter: none;
   background-color: var(--bg-surface);
 }
+
+html.theme-midnight .control-btn {
+  border-radius: var(--radius-md) !important;
+}
