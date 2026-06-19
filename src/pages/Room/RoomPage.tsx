@@ -269,12 +269,7 @@ export const RoomPage: React.FC = () => {
 
       <div className="relative flex flex-1 flex-col lg:flex-row min-h-0 overflow-hidden animate-fade-in">
         <div className="flex-1 min-w-0 min-h-0 overflow-y-auto overflow-x-hidden p-3 sm:p-4 md:p-6 flex flex-col">
-          <div
-            className={cn(
-              "mx-auto w-full min-w-0 transition-all duration-300",
-              showSidebar ? "max-w-4xl" : "max-w-6xl",
-            )}
-          >
+          <div className="w-full min-w-0">
             <VideoPlayer
               video={roomState.currentVideo}
               currentTime={roomState.currentTime}

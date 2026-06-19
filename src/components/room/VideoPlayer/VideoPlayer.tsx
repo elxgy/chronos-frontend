@@ -361,7 +361,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     return (
       <div
         id="video-container"
-        className="relative w-full min-h-[200px] aspect-video bg-theme-surface/80 rounded-xl border-2 border-theme overflow-hidden flex items-center justify-center"
+        className="relative w-full min-h-[200px] max-h-[70vh] aspect-video bg-theme-surface/80 rounded-xl border-2 border-theme overflow-hidden flex items-center justify-center"
       >
         <div className="text-center px-6 py-8">
           <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-theme-hover/80 flex items-center justify-center border-2 border-theme">
@@ -381,7 +381,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   return (
     <div
       id="video-container"
-      className="relative w-full aspect-video bg-theme-elevated rounded-xl overflow-hidden group"
+      className="relative w-full aspect-video max-h-[70vh] bg-theme-elevated rounded-xl overflow-hidden group"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
     >
