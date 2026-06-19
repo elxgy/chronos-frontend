@@ -167,7 +167,7 @@ export const RoomPage: React.FC = () => {
 
   if (phase === "initial" || phase === "bootstrapping") {
     return (
-      <div className="min-h-screen bg-dark-950 flex flex-col">
+    <div className="h-screen bg-dark-950 flex flex-col overflow-hidden">
         <div className="h-14 bg-dark-900/90 border-b border-dark-700" />
         <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
           <div className="flex-1 space-y-4">
@@ -235,7 +235,7 @@ export const RoomPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-950 flex flex-col">
+    <div className="h-screen bg-dark-950 flex flex-col overflow-hidden">
       <Header
         roomCode={code}
         participantCount={participants.length}
@@ -268,7 +268,7 @@ export const RoomPage: React.FC = () => {
       )}
 
       <div className="relative flex flex-1 flex-col lg:flex-row min-h-0 overflow-hidden animate-fade-in">
-        <div className="flex-1 min-w-0 overflow-auto p-3 sm:p-4 md:p-6 flex flex-col">
+        <div className="flex-1 min-w-0 min-h-0 overflow-y-auto p-3 sm:p-4 md:p-6 flex flex-col">
           <div
             className={cn(
               "mx-auto w-full transition-all duration-300",
@@ -379,7 +379,7 @@ export const RoomPage: React.FC = () => {
             </button>
           </div>
 
-          <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
+          <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin">
             {sidebarTab === "queue" ? (
               <Queue
                 videos={roomState.queue}
