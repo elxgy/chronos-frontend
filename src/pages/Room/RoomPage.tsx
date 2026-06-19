@@ -167,16 +167,40 @@ export const RoomPage: React.FC = () => {
 
   if (phase === "initial" || phase === "bootstrapping") {
     return (
-      <MainLayout
-        className="min-h-screen flex items-center justify-center"
-        maxWidth="full"
-      >
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-10 h-10 text-primary-400 animate-spin" />
-          <p className="text-dark-300 font-medium">Connecting to room...</p>
-          <p className="text-sm text-dark-500">Setting up real-time sync</p>
+      <div className="min-h-screen bg-dark-950 flex flex-col">
+        <div className="h-14 bg-dark-900/90 border-b border-dark-700" />
+        <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
+          <div className="flex-1 space-y-4">
+            <div className="skeleton aspect-video w-full" />
+            <div className="flex gap-3">
+              <div className="skeleton w-20 h-12 rounded" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="skeleton h-4 w-3/4 rounded" />
+                <div className="skeleton h-3 w-1/2 rounded" />
+              </div>
+            </div>
+            <div className="flex gap-3 justify-center">
+              <div className="skeleton w-12 h-12 rounded-full" />
+              <div className="skeleton w-12 h-12 rounded-full" />
+              <div className="skeleton w-12 h-12 rounded-full" />
+              <div className="skeleton w-12 h-12 rounded-full" />
+            </div>
+          </div>
+          <div className="hidden lg:block w-96 space-y-3">
+            <div className="flex gap-2">
+              <div className="skeleton h-8 w-20 rounded" />
+              <div className="skeleton h-8 w-20 rounded" />
+              <div className="skeleton h-8 w-20 rounded" />
+            </div>
+            <div className="skeleton h-10 w-full rounded-lg" />
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="skeleton h-16 w-full rounded-lg" />
+              ))}
+            </div>
+          </div>
         </div>
-      </MainLayout>
+      </div>
     );
   }
 
