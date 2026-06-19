@@ -178,7 +178,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [video?.id]);
 
   useEffect(() => {
-    if (!isHost || isPlaying || seekingTime !== null) {
+    if (!isHost || !isPlaying || seekingTime !== null) {
       setHostDisplayTime(currentTime);
     }
   }, [currentTime, isHost, isPlaying, seekingTime]);
