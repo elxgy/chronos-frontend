@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import {
   ListMusic,
   Plus,
@@ -8,10 +8,13 @@ import {
   PlayCircle,
   Repeat,
   Shuffle,
+  Search,
+  X,
 } from "lucide-react";
 import { cn, formatDuration, parseYouTubeInput } from "@/utils/helpers";
-import { Button, Input, Card, ConfirmModal } from "@/components/common";
-import { Video } from "@/types";
+import { Button, Input, ConfirmModal } from "@/components/common";
+import { Video, SearchResult } from "@/types";
+import { getApiUrl } from "@/config";
 
 interface QueueProps {
   videos: Video[];
@@ -49,6 +52,63 @@ export const Queue: React.FC<QueueProps> = ({
   const [justShuffled, setJustShuffled] = useState(false);
   const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<number | null>(null);
+
+  const isUrl = (value: string) => {
+    const parsed = parseYouTubeInput(value);
+    return !!(parsed.videoId || parsed.playlistId);
+  };
+
+  const handleSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const response = await fetch(
+        getApiUrl(`/api/youtube/search?q=${encodeURIComponent(query)}`)
+      );
+      if (response.ok) {
+        const results = await response.json();
+        setSearchResults(results || []);
+      }
+    } catch {
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  const handleInputChange = (value: string) => {
+    setNewVideoUrl(value);
+    setError("");
+    if (searchTimeoutRef.current) {
+      window.clearTimeout(searchTimeoutRef.current);
+    }
+    if (isUrl(value) || !value.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    searchTimeoutRef.current = window.setTimeout(() => {
+      handleSearch(value);
+    }, 400);
+  };
+
+  const handleAddFromSearch = async (result: SearchResult) => {
+    setIsAdding(true);
+    try {
+      await onAddVideo(result.id);
+      setSearchResults([]);
+      setNewVideoUrl("");
+    } catch {
+      setError("Failed to add video");
+    } finally {
+      setIsAdding(false);
+    }
+  };
 
   const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
@@ -114,7 +174,7 @@ export const Queue: React.FC<QueueProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col" padding="none">
+    <div className="h-full flex flex-col">
       <div className="p-4 border-b border-dark-700">
         <div className="flex items-center gap-2 mb-4">
           <ListMusic className="w-5 h-5 text-primary-400" />
@@ -186,23 +246,71 @@ export const Queue: React.FC<QueueProps> = ({
           variant="danger"
         />
 
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Input
-            placeholder="Paste YouTube URL, video ID, or playlist link"
-            value={newVideoUrl}
-            onChange={(e) => setNewVideoUrl(e.target.value)}
-            error={error}
-            className="text-sm min-h-[44px]"
-          />
-          <Button
-            variant="primary"
-            onClick={handleAdd}
-            loading={isAdding}
-            disabled={!newVideoUrl.trim() || isAdding}
-            className="min-h-[44px] touch-manipulation sm:shrink-0"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
+        <div className="flex flex-col gap-2">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder="Search YouTube or paste a link"
+                value={newVideoUrl}
+                onChange={(e) => handleInputChange(e.target.value)}
+                error={error}
+                className="text-sm min-h-[44px] pr-8"
+              />
+              {newVideoUrl && (
+                <button
+                  onClick={() => {
+                    setNewVideoUrl("");
+                    setSearchResults([]);
+                    setError("");
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-200"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <Button
+              variant="primary"
+              onClick={handleAdd}
+              loading={isAdding}
+              disabled={!newVideoUrl.trim() || isAdding}
+              className="min-h-[44px] touch-manipulation sm:shrink-0"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="max-h-60 overflow-y-auto scrollbar-thin rounded-lg border border-dark-600 bg-dark-800 divide-y divide-dark-700">
+              {searchResults.map((result) => (
+                <button
+                  key={result.id}
+                  onClick={() => handleAddFromSearch(result)}
+                  disabled={isAdding}
+                  className="w-full flex items-center gap-3 p-2 hover:bg-dark-700/50 transition-colors text-left disabled:opacity-50"
+                >
+                  {result.thumbnail && (
+                    <img
+                      src={result.thumbnail}
+                      alt=""
+                      className="w-16 h-9 rounded object-cover flex-shrink-0"
+                    />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-dark-100 line-clamp-1">{result.title}</p>
+                    <p className="text-xs text-dark-400 truncate">{result.channel}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {isSearching && (
+            <div className="flex items-center gap-2 text-xs text-dark-400 px-1">
+              <Search className="w-3 h-3 animate-pulse" />
+              Searching...
+            </div>
+          )}
         </div>
       </div>
 
@@ -293,6 +401,6 @@ export const Queue: React.FC<QueueProps> = ({
           </ul>
         )}
       </div>
-    </Card>
+    </div>
   );
 };

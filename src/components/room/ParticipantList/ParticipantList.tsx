@@ -8,7 +8,6 @@ import {
   WifiOff,
 } from 'lucide-react';
 import { cn, getQualityColor, getQualityBgColor, getQualityLabel } from '@/utils/helpers';
-import { Card } from '@/components/common';
 import { Participant, ConnectionQuality } from '@/types';
 
 interface ParticipantListProps {
@@ -38,7 +37,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
   };
 
   return (
-    <Card className="h-full flex flex-col" padding="none">
+    <div className="h-full flex flex-col">
       <div className="p-4 border-b border-dark-700">
         <div className="flex items-center gap-2">
           <Users className="w-5 h-5 text-primary-400" />
@@ -133,7 +132,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
           </ul>
         )}
       </div>
-    </Card>
+    </div>
   );
 };
 
