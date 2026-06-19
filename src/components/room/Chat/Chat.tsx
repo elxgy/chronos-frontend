@@ -79,7 +79,7 @@ export const Chat: React.FC<ChatProps> = ({
             <div
               key={msg.messageId}
               className={cn(
-                "animate-fade-in",
+                "animate-slide-up",
                 msg.userId === currentUserId && "flex flex-col items-end"
               )}
             >

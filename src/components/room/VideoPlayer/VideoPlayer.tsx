@@ -498,7 +498,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       {isHost && isPlaying && (
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse-slow" />
             Syncing
           </span>
         </div>

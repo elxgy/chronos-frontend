@@ -217,7 +217,7 @@ export const Queue: React.FC<QueueProps> = ({
               <li
                 key={`${video.id}-${index}`}
                 className={cn(
-                  "p-3 hover:bg-dark-700/50 transition-colors group",
+                  "p-3 hover:bg-dark-700/50 transition-colors group animate-slide-up",
                   currentVideoId === video.id && "bg-primary-500/10",
                   dragIndex === index && "opacity-50",
                 )}
