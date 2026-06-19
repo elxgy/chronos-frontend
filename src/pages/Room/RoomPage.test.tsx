@@ -39,8 +39,10 @@ function buildHookResult(overrides: Partial<UseRoomBootstrapResult>): UseRoomBoo
     chatMessages: [],
     loadError: '',
     roomError: '',
+    reconnectAttempt: 0,
     sendMessage: vi.fn(),
     handleLeave: vi.fn(),
+    manualReconnect: vi.fn(),
     wsRef: { current: null },
     shouldReconnectRef: { current: true },
     ...overrides,
@@ -92,12 +94,13 @@ describe('RoomPage', () => {
     mockUseRoomBootstrap.mockReturnValue(
       buildHookResult({
         phase: 'recovering',
+        reconnectAttempt: 3,
       })
     );
 
     renderRoomPage();
 
-    expect(screen.getByText('Realtime disconnected, reconnecting...')).toBeInTheDocument();
+    expect(screen.getByText('Reconnecting... Attempt 3 of 5')).toBeInTheDocument();
   });
 
   it('sends clear_queue when host confirms clear', async () => {

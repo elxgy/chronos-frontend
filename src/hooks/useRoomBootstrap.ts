@@ -51,6 +51,7 @@ type BootstrapState = {
   loadError: string;
   roomError: string;
   lastAppliedVersion: number;
+  reconnectAttempt: number;
 };
 
 type BootstrapAction =
@@ -76,7 +77,10 @@ type BootstrapAction =
   | { type: "SET_QUEUE"; queue: Video[] }
   | { type: "UPDATE_PARTICIPANT_QUALITY"; qualities: ClientQuality[] }
   | { type: "ADD_CHAT_MESSAGE"; message: ChatMessage }
-  | { type: "SET_CHAT_HISTORY"; messages: ChatMessage[] };
+  | { type: "SET_CHAT_HISTORY"; messages: ChatMessage[] }
+  | { type: "RECONNECT_ATTEMPT"; attempt: number }
+  | { type: "RECONNECT_SUCCESS" }
+  | { type: "RECONNECT_FAILED" };
 
 const initialBootstrapState: BootstrapState = {
   phase: "initial",
@@ -88,6 +92,7 @@ const initialBootstrapState: BootstrapState = {
   loadError: "",
   roomError: "",
   lastAppliedVersion: 0,
+  reconnectAttempt: 0,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -232,6 +237,7 @@ function bootstrapReducer(
         loadError: "",
         roomError: "",
         lastAppliedVersion: 0,
+        reconnectAttempt: 0,
       };
     }
     case "BOOTSTRAP_SUCCESS":
@@ -246,6 +252,7 @@ function bootstrapReducer(
         loadError: "",
         roomError: "",
         lastAppliedVersion: action.roomState.stateVersion ?? 0,
+        reconnectAttempt: 0,
       };
     case "BOOTSTRAP_FATAL":
       return {
@@ -261,6 +268,7 @@ function bootstrapReducer(
         ...state,
         phase: "ready",
         roomError: "",
+        reconnectAttempt: 0,
       };
     case "WS_DISCONNECTED":
       return {
@@ -398,6 +406,12 @@ function bootstrapReducer(
       return { ...state, chatMessages: [...state.chatMessages, action.message] };
     case "SET_CHAT_HISTORY":
       return { ...state, chatMessages: action.messages };
+    case "RECONNECT_ATTEMPT":
+      return { ...state, phase: "recovering", reconnectAttempt: action.attempt };
+    case "RECONNECT_SUCCESS":
+      return { ...state, phase: "ready", reconnectAttempt: 0, roomError: "" };
+    case "RECONNECT_FAILED":
+      return { ...state, reconnectAttempt: 0, roomError: "Connection lost. Please try reconnecting." };
     default:
       return state;
   }
@@ -460,8 +474,10 @@ export type UseRoomBootstrapResult = {
   chatMessages: ChatMessage[];
   loadError: string;
   roomError: string;
+  reconnectAttempt: number;
   sendMessage: (message: Record<string, unknown>) => void;
   handleLeave: () => void;
+  manualReconnect: () => void;
   wsRef: React.MutableRefObject<WebSocket | null>;
   shouldReconnectRef: React.MutableRefObject<boolean>;
 };
@@ -490,6 +506,7 @@ export function useRoomBootstrap(
   const prevStateRef = useRef(state);
   const qualityPollRef = useRef<number | null>(null);
   const pingIntervalRef = useRef<number | null>(null);
+  const connectRef = useRef<(() => void) | null>(null);
 
   const clearPollingIntervals = useCallback(() => {
     if (qualityPollRef.current !== null) {
@@ -934,13 +951,14 @@ export function useRoomBootstrap(
         if (wsRef.current === socket) wsRef.current = null;
         clearPollingIntervals();
         if (!shouldReconnectRef.current) return;
-        dispatch(
-          {
-            type: "WS_DISCONNECTED",
-            error: "Realtime disconnected, reconnecting...",
-          },
-          "ws_close",
-        );
+
+        const MAX_RECONNECT_ATTEMPTS = 5;
+        const nextAttempt = (state.reconnectAttempt || 0) + 1;
+        if (nextAttempt > MAX_RECONNECT_ATTEMPTS) {
+          dispatch({ type: "RECONNECT_FAILED" }, "ws_max_attempts");
+          return;
+        }
+        dispatch({ type: "RECONNECT_ATTEMPT", attempt: nextAttempt }, "ws_close");
         reconnectTimeoutRef.current = window.setTimeout(() => {
           reconnectDelayRef.current = Math.min(
             reconnectDelayRef.current * 2,
@@ -953,11 +971,13 @@ export function useRoomBootstrap(
       wsRef.current = socket;
     };
 
+    connectRef.current = connect;
     connect();
 
     return () => {
       shouldReconnectRef.current = false;
       connectionSeqRef.current += 1;
+      connectRef.current = null;
       clearPollingIntervals();
       if (reconnectTimeoutRef.current !== null) {
         window.clearTimeout(reconnectTimeoutRef.current);
@@ -981,6 +1001,13 @@ export function useRoomBootstrap(
     navigateRef.current("/");
   }, [sendMessage]);
 
+  const manualReconnect = useCallback(() => {
+    dispatch({ type: "RECONNECT_ATTEMPT", attempt: 1 }, "manual_reconnect");
+    reconnectDelayRef.current = 1000;
+    shouldReconnectRef.current = true;
+    connectRef.current?.();
+  }, [dispatch]);
+
   return {
     phase: state.phase,
     session: state.session,
@@ -989,8 +1016,10 @@ export function useRoomBootstrap(
     chatMessages: state.chatMessages,
     loadError: state.loadError,
     roomError: state.roomError,
+    reconnectAttempt: state.reconnectAttempt,
     sendMessage,
     handleLeave,
+    manualReconnect,
     wsRef,
     shouldReconnectRef,
   };

@@ -25,8 +25,10 @@ export const RoomPage: React.FC = () => {
     participants,
     loadError,
     roomError,
+    reconnectAttempt,
     sendMessage,
     handleLeave,
+    manualReconnect,
     chatMessages,
   } = useRoomBootstrap(code, location.state, navigate);
 
@@ -212,13 +214,16 @@ export const RoomPage: React.FC = () => {
       {phase === "recovering" && (
         <div className="flex items-center gap-2 px-4 py-3 text-sm text-yellow-300 bg-yellow-500/10 border-b border-yellow-500/20 shrink-0">
           <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
-          <span>Realtime disconnected, reconnecting...</span>
+          <span>Reconnecting... Attempt {reconnectAttempt} of 5</span>
         </div>
       )}
-      {roomError && (
-        <div className="flex items-center gap-2 px-4 py-3 text-sm text-yellow-300 bg-yellow-500/10 border-b border-yellow-500/20 shrink-0">
+      {roomError && phase !== "recovering" && (
+        <div className="flex items-center gap-2 px-4 py-3 text-sm text-red-300 bg-red-500/10 border-b border-red-500/20 shrink-0">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{roomError}</span>
+          <button onClick={manualReconnect} className="ml-auto px-3 py-1 text-xs font-medium bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors">
+            Reconnect
+          </button>
         </div>
       )}
 
