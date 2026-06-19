@@ -423,7 +423,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onChange={(e) => setSeekingTime(Number(e.target.value))}
             onMouseUp={commitSeek}
             onTouchEnd={commitSeek}
-            className="w-full accent-primary-500 disabled:opacity-60 cursor-pointer"
+            className="range-seek w-full"
           />
           <div className="flex items-center justify-between text-xs text-dark-300 mt-1">
             <span>{formatTime(progressTime)}</span>
@@ -476,7 +476,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 max={100}
                 value={volume}
                 onChange={(e) => handleVolumeChange(Number(e.target.value))}
-                className="w-16 sm:w-20 accent-primary-500 cursor-pointer touch-manipulation"
+                className="range-volume w-16 sm:w-20 touch-manipulation"
                 aria-label="Volume"
               />
             </div>
