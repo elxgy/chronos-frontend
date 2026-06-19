@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Loader2, AlertCircle, X } from "lucide-react";
 import { cn } from "@/utils/helpers";
@@ -35,70 +35,73 @@ export const RoomPage: React.FC = () => {
   );
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
+  const isHost = session?.isHost ?? false;
+  const participantId = session?.participantId ?? "";
+
   const onLeaveClick = () => setShowLeaveConfirm(true);
   const onLeaveConfirm = () => {
     setShowLeaveConfirm(false);
     handleLeave();
   };
 
-  const handleSeek = (time: number) => {
+  const handleSeek = useCallback((time: number) => {
     sendMessage({
       type: "control",
       payload: { type: "seek", payload: { targetTime: time } },
     });
-  };
+  }, [sendMessage]);
 
-  const handleSkip = () => {
+  const handleSkip = useCallback(() => {
     sendMessage({ type: "control", payload: { type: "skip" } });
-  };
+  }, [sendMessage]);
 
-  const handleAddVideo = async (videoId: string) => {
+  const handleAddVideo = useCallback(async (videoId: string) => {
     sendMessage({ type: "add_video", payload: { videoId } });
-  };
+  }, [sendMessage]);
 
-  const handleAddPlaylist = (playlistId: string) => {
+  const handleAddPlaylist = useCallback((playlistId: string) => {
     sendMessage({ type: "add_playlist", payload: { playlistId } });
-  };
+  }, [sendMessage]);
 
-  const handleRemoveVideo = (videoId: string) => {
+  const handleRemoveVideo = useCallback((videoId: string) => {
     sendMessage({ type: "remove_video", payload: { videoId } });
-  };
+  }, [sendMessage]);
 
-  const handleReorder = (fromIndex: number, toIndex: number) => {
+  const handleReorder = useCallback((fromIndex: number, toIndex: number) => {
     sendMessage({ type: "reorder_queue", payload: { fromIndex, toIndex } });
-  };
+  }, [sendMessage]);
 
-  const handlePlay = () => {
+  const handlePlay = useCallback(() => {
     sendMessage({ type: "control", payload: { type: "play" } });
-  };
+  }, [sendMessage]);
 
-  const handlePause = () => {
+  const handlePause = useCallback(() => {
     sendMessage({ type: "control", payload: { type: "pause" } });
-  };
+  }, [sendMessage]);
 
-  const handleSetAutoplay = (enabled: boolean) => {
+  const handleSetAutoplay = useCallback((enabled: boolean) => {
     sendMessage({
       type: "control",
       payload: { type: "set_autoplay", payload: { enabled } },
     });
-  };
+  }, [sendMessage]);
 
-  const handleSetLoop = (enabled: boolean) => {
+  const handleSetLoop = useCallback((enabled: boolean) => {
     sendMessage({
       type: "control",
       payload: { type: "set_loop", payload: { enabled } },
     });
-  };
+  }, [sendMessage]);
 
-  const handleClearQueue = () => {
+  const handleClearQueue = useCallback(() => {
     sendMessage({ type: "clear_queue", payload: {} });
-  };
+  }, [sendMessage]);
 
-  const handleShuffleQueue = () => {
+  const handleShuffleQueue = useCallback(() => {
     sendMessage({ type: "control", payload: { type: "shuffle_queue" } });
-  };
+  }, [sendMessage]);
 
-  const handleSeekBack10 = () => {
+  const handleSeekBack10 = useCallback(() => {
     if (!isHost || !roomState.currentVideo) {
       return;
     }
@@ -107,9 +110,9 @@ export const RoomPage: React.FC = () => {
       type: "control",
       payload: { type: "seek", payload: { targetTime: target } },
     });
-  };
+  }, [isHost, roomState.currentVideo, roomState.currentTime, sendMessage]);
 
-  const handleSeekForward10 = () => {
+  const handleSeekForward10 = useCallback(() => {
     if (!isHost || !roomState.currentVideo) {
       return;
     }
@@ -119,7 +122,7 @@ export const RoomPage: React.FC = () => {
       type: "control",
       payload: { type: "seek", payload: { targetTime: target } },
     });
-  };
+  }, [isHost, roomState.currentVideo, roomState.currentTime, sendMessage]);
 
   if (!code) {
     return (
@@ -179,9 +182,6 @@ export const RoomPage: React.FC = () => {
       </MainLayout>
     );
   }
-
-  const isHost = session?.isHost ?? false;
-  const participantId = session?.participantId ?? "";
 
   return (
     <div className="min-h-screen bg-dark-950 flex flex-col">

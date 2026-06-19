@@ -259,7 +259,6 @@ function bootstrapReducer(
     case "WS_DISCONNECTED":
       return {
         ...state,
-        phase: state.phase === "ready" ? "recovering" : state.phase,
         roomError: action.error,
       };
     case "SET_ROOM_ERROR":
@@ -916,7 +915,7 @@ export function useRoomBootstrap(
       }
       wsRef.current = null;
     };
-  }, [state.phase, state.session, code, dispatch]);
+  }, [state.session, code, dispatch]);
 
   const handleLeave = useCallback(() => {
     shouldReconnectRef.current = false;

@@ -47,6 +47,7 @@ export const Queue: React.FC<QueueProps> = ({
   const [error, setError] = useState("");
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [justShuffled, setJustShuffled] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
 
   const handleAdd = async () => {
     if (!newVideoUrl.trim()) return;
@@ -85,15 +86,25 @@ export const Queue: React.FC<QueueProps> = ({
   };
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
-    e.dataTransfer.setData("dragIndex", index.toString());
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = "move";
   };
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    const dragIndex = parseInt(e.dataTransfer.getData("dragIndex"), 10);
-    if (dragIndex !== index) {
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (dragIndex !== null && dragIndex !== index) {
       onReorder(dragIndex, index);
     }
+    setDragIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
   };
 
   return (
@@ -208,10 +219,13 @@ export const Queue: React.FC<QueueProps> = ({
                 className={cn(
                   "p-3 hover:bg-dark-700/50 transition-colors group",
                   currentVideoId === video.id && "bg-primary-500/10",
+                  dragIndex === index && "opacity-50",
                 )}
                 draggable={isHost}
                 onDragStart={(e) => handleDragStart(e, index)}
-                onDragOver={(e) => handleDragOver(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
                 onClick={() => onVideoClick?.(video)}
               >
                 <div className="flex items-center gap-3">
