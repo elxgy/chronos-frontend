@@ -39,7 +39,6 @@ export default {
         accent: {
           cyan: '#06b6d4',
           teal: '#14b8a6',
-          indigo: '#6366f1',
           success: '#22c55e',
           warning: '#f59e0b',
           error: '#ef4444',
@@ -71,8 +70,8 @@ export default {
         },
       },
       boxShadow: {
-        'glow': '0 0 20px rgba(168, 85, 247, 0.3)',
-        'glow-lg': '0 0 40px rgba(168, 85, 247, 0.4)',
+        'glow': '0 0 20px rgba(59, 130, 246, 0.15)',
+        'glow-lg': '0 0 40px rgba(59, 130, 246, 0.25)',
       },
     },
   },

@@ -5,14 +5,6 @@
 @layer base {
   :root {
     --header-height: 3.5rem;
-    --bg-primary: #020617;
-    --bg-secondary: #0f172a;
-    --bg-tertiary: #1e293b;
-    --accent: #3b82f6;
-    --accent-hover: #60a5fa;
-    --text-primary: #f8fafc;
-    --text-secondary: #94a3b8;
-    --border: #334155;
   }
 
   * {
@@ -87,9 +79,7 @@
     @apply badge bg-accent-error/20 text-red-400 border border-accent-error/30;
   }
 
-  .tooltip {
-    @apply absolute z-50 px-2 py-1 text-xs font-medium text-white bg-dark-700 rounded shadow-lg;
-  }
+
 }
 
 @layer utilities {
@@ -121,10 +111,10 @@
   }
 
   .glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
   }
 
   .glow-lg {
-    box-shadow: 0 0 40px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
   }
 }
