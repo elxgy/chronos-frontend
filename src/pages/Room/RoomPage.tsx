@@ -12,6 +12,7 @@ import {
 } from "@/components/room";
 import { Button, ConfirmModal } from "@/components/common";
 import { useRoomBootstrap } from "@/hooks/useRoomBootstrap";
+import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 
 export const RoomPage: React.FC = () => {
   const { code } = useParams<{ code: string }>();
@@ -134,6 +135,21 @@ export const RoomPage: React.FC = () => {
       payload: { type: "seek", payload: { targetTime: target } },
     });
   }, [isHost, roomState.currentVideo, roomState.currentTime, sendMessage]);
+
+  const handleToggleMute = useCallback(() => {
+    window.dispatchEvent(new CustomEvent("chronos:toggle-mute"));
+  }, []);
+
+  useKeyboardShortcuts({
+    isHost,
+    isPlaying: roomState.isPlaying,
+    onPlay: handlePlay,
+    onPause: handlePause,
+    onSeekBack10: handleSeekBack10,
+    onSeekForward10: handleSeekForward10,
+    onSkip: handleSkip,
+    onToggleMute: handleToggleMute,
+  });
 
   if (!code) {
     return (

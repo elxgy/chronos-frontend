@@ -297,6 +297,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
+  useEffect(() => {
+    const handleToggleMute = () => {
+      toggleMute();
+    };
+    window.addEventListener("chronos:toggle-mute", handleToggleMute);
+    return () => window.removeEventListener("chronos:toggle-mute", handleToggleMute);
+  }, [toggleMute]);
+
   const handleFullscreen = () => {
     const container = document.getElementById("video-container");
     if (!container) return;
