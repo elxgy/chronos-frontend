@@ -1,0 +1,66 @@
+/* Dark Blue Theme (default) */
+html.theme-dark-blue {
+  --bg-root: #020617;
+  --bg-surface: #0f172a;
+  --bg-elevated: #1e293b;
+  --bg-hover: #334155;
+  --border: #334155;
+  --border-subtle: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-muted: rgba(59, 130, 246, 0.15);
+  --text-on-accent: #ffffff;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-glow-lg: 0 0 40px rgba(59, 130, 246, 0.25);
+  --backdrop-blur: blur(12px);
+}
+
+/* Midnight Theme */
+html.theme-midnight {
+  --bg-root: #09090b;
+  --bg-surface: #18181b;
+  --bg-elevated: #27272a;
+  --bg-hover: #3f3f46;
+  --border: #27272a;
+  --border-subtle: #18181b;
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --accent: #fafafa;
+  --accent-hover: #e4e4e7;
+  --accent-muted: rgba(250, 250, 250, 0.08);
+  --text-on-accent: #09090b;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --shadow-glow: none;
+  --shadow-glow-lg: none;
+  --backdrop-blur: none;
+}
+
+/* Midnight: override Tailwind rounded classes */
+html.theme-midnight .rounded-sm { border-radius: 0.125rem !important; }
+html.theme-midnight .rounded { border-radius: 0.25rem !important; }
+html.theme-midnight .rounded-md { border-radius: 0.375rem !important; }
+html.theme-midnight .rounded-lg { border-radius: 0.375rem !important; }
+html.theme-midnight .rounded-xl { border-radius: 0.5rem !important; }
+html.theme-midnight .rounded-2xl { border-radius: 0.5rem !important; }
+
+/* Midnight-specific overrides */
+html.theme-midnight .sidebar-panel {
+  backdrop-filter: none;
+  background-color: var(--bg-surface);
+}
+
+html.theme-midnight .header-bar {
+  backdrop-filter: none;
+  background-color: var(--bg-surface);
+}

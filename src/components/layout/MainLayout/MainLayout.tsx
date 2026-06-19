@@ -23,7 +23,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-dark-950">
+    <div className="min-h-screen bg-theme-root">
       <div
         className={cn(
           'mx-auto px-4 sm:px-6 lg:px-8 py-8',

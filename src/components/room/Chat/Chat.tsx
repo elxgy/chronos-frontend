@@ -68,18 +68,18 @@ export const Chat: React.FC<ChatProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center py-8">
-            <div className="w-12 h-12 rounded-xl bg-dark-700/80 flex items-center justify-center mb-3">
-              <MessageSquare className="w-6 h-6 text-dark-500" />
+            <div className="w-12 h-12 rounded-xl bg-theme-hover/80 flex items-center justify-center mb-3">
+              <MessageSquare className="w-6 h-6 text-theme-muted" />
             </div>
-            <p className="text-dark-300 font-medium text-sm">No messages yet</p>
-            <p className="text-dark-500 text-xs mt-1">Start the conversation!</p>
+            <p className="text-theme-secondary font-medium text-sm">No messages yet</p>
+            <p className="text-theme-secondary text-xs mt-1">Start the conversation!</p>
           </div>
         ) : (
           messages.map((msg) => (
             <div
               key={msg.messageId}
               className={cn(
-                "animate-slide-up",
+                "animate-fade-in",
                 msg.userId === currentUserId && "flex flex-col items-end"
               )}
             >
@@ -92,11 +92,11 @@ export const Chat: React.FC<ChatProps> = ({
                 >
                   {msg.nickname}
                 </span>
-                <span className="text-xs text-dark-500">
+                <span className="text-xs text-theme-muted">
                   {formatTime(msg.timestamp)}
                 </span>
               </div>
-              <p className="text-sm text-dark-200 mt-0.5 break-words max-w-full">
+              <p className="text-sm text-theme-secondary mt-0.5 break-words max-w-full">
                 {msg.text}
               </p>
             </div>
@@ -105,7 +105,7 @@ export const Chat: React.FC<ChatProps> = ({
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="p-3 border-t border-dark-700">
+      <div className="p-3 border-t-2 border-theme">
         <div className="flex items-center gap-2">
           <input
             ref={inputRef}
@@ -115,7 +115,7 @@ export const Chat: React.FC<ChatProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             maxLength={500}
-            className="flex-1 bg-dark-800 border border-dark-600 rounded-lg px-3 py-2 text-sm text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
+            className="flex-1 bg-theme-elevated border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent/50 focus:border-theme-accent"
           />
           <button
             onClick={handleSend}
@@ -123,8 +123,8 @@ export const Chat: React.FC<ChatProps> = ({
             className={cn(
               "p-2 rounded-lg transition-all duration-200",
               input.trim()
-                ? "bg-primary-600 hover:bg-primary-500 text-white"
-                : "bg-dark-700 text-dark-500 cursor-not-allowed"
+                ? "bg-theme-accent hover:bg-theme-accent text-on-accent"
+                : "bg-theme-hover text-theme-muted cursor-not-allowed"
             )}
           >
             <Send className="w-4 h-4" />

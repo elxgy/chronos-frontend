@@ -11,7 +11,7 @@ export const Card = React.forwardRef<HTMLDivElement, CardProps>(
     const variants = {
       default: 'card',
       hover: 'card-hover',
-      bordered: 'bg-transparent border-2 border-dark-600',
+      bordered: 'bg-transparent border-2 border-theme',
     };
 
     const paddings = {
@@ -54,7 +54,7 @@ export const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('text-lg font-semibold text-dark-100', className)}
+    className={cn('text-lg font-semibold text-theme-primary', className)}
     {...props}
   />
 ));

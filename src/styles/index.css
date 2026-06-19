@@ -1,3 +1,5 @@
+@import './themes.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,11 +10,12 @@
   }
 
   * {
-    @apply border-dark-700;
+    border-color: var(--border);
   }
 
   body {
-    @apply bg-dark-950 text-dark-50 antialiased;
+    background-color: var(--bg-root);
+    color: var(--text-primary);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     touch-action: manipulation;
   }
@@ -24,59 +27,96 @@
 
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-500 focus:ring-primary-500 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40;
+    @apply btn;
+    background-color: var(--accent);
+    color: var(--bg-root);
+    box-shadow: var(--shadow-glow);
+  }
+  .btn-primary:hover {
+    background-color: var(--accent-hover);
+    box-shadow: var(--shadow-glow-lg);
   }
 
   .btn-secondary {
-    @apply btn bg-dark-700 text-dark-100 hover:bg-dark-600 focus:ring-dark-500 border border-dark-600;
+    @apply btn;
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover {
+    background-color: var(--bg-hover);
   }
 
   .btn-ghost {
-    @apply btn text-dark-300 hover:text-dark-100 hover:bg-dark-800;
+    @apply btn;
+    color: var(--text-secondary);
+  }
+  .btn-ghost:hover {
+    color: var(--text-primary);
+    background-color: var(--bg-elevated);
   }
 
   .btn-danger {
-    @apply btn bg-accent-error text-white hover:bg-red-600 focus:ring-red-500;
+    @apply btn bg-red-600 text-white hover:bg-red-500 focus:ring-red-500;
   }
 
   .btn-success {
-    @apply btn bg-accent-success text-white hover:bg-green-600 focus:ring-green-500;
+    @apply btn bg-green-600 text-white hover:bg-green-500 focus:ring-green-500;
   }
 
   .input {
-    @apply w-full px-4 py-3 bg-dark-800 border border-dark-600 rounded-lg text-dark-100 placeholder-dark-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-lg transition-all duration-200 focus:outline-none;
+    background-color: var(--bg-elevated);
+    border: 2px solid var(--border);
+    color: var(--text-primary);
+  }
+  .input::placeholder {
+    color: var(--text-muted);
+  }
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-muted);
   }
 
   .card {
-    @apply bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl;
+    background-color: var(--bg-surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-xl);
   }
 
   .card-hover {
-    @apply card hover:border-primary-500/50 hover:shadow-glow transition-all duration-300;
+    @apply card transition-all duration-300;
+  }
+  .card-hover:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-glow);
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium;
+    border-radius: 9999px;
   }
 
   .badge-primary {
-    @apply badge bg-primary-500/20 text-primary-300 border border-primary-500/30;
+    @apply badge;
+    background-color: var(--accent-muted);
+    color: var(--accent);
   }
 
   .badge-success {
-    @apply badge bg-accent-success/20 text-green-400 border border-accent-success/30;
+    @apply badge bg-green-500/20 text-green-400;
   }
 
   .badge-warning {
-    @apply badge bg-accent-warning/20 text-yellow-400 border border-accent-warning/30;
+    @apply badge bg-yellow-500/20 text-yellow-400;
   }
 
   .badge-error {
-    @apply badge bg-accent-error/20 text-red-400 border border-accent-error/30;
+    @apply badge bg-red-500/20 text-red-400;
   }
 
   .range-seek {
@@ -92,52 +132,52 @@
   .range-seek::-webkit-slider-runnable-track {
     height: 6px;
     border-radius: 9999px;
-    background: #334155;
+    background: var(--bg-hover);
   }
 
   .range-seek::-webkit-slider-thumb {
     width: 14px;
     height: 14px;
     border-radius: 9999px;
-    background: #60a5fa;
-    border: 2px solid #93c5fd;
+    background: var(--accent);
+    border: 2px solid var(--accent-hover);
     margin-top: -4px;
     transition: box-shadow 0.2s, transform 0.2s;
   }
 
   .range-seek:hover::-webkit-slider-thumb {
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
     transform: scale(1.1);
   }
 
   .range-seek:active::-webkit-slider-thumb {
     transform: scale(1.25);
-    box-shadow: 0 0 16px rgba(96, 165, 250, 0.7);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 70%, transparent);
   }
 
   .range-seek::-moz-range-track {
     height: 6px;
     border-radius: 9999px;
-    background: #334155;
+    background: var(--bg-hover);
   }
 
   .range-seek::-moz-range-thumb {
     width: 14px;
     height: 14px;
     border-radius: 9999px;
-    background: #60a5fa;
-    border: 2px solid #93c5fd;
+    background: var(--accent);
+    border: 2px solid var(--accent-hover);
     transition: box-shadow 0.2s, transform 0.2s;
   }
 
   .range-seek:hover::-moz-range-thumb {
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
     transform: scale(1.1);
   }
 
   .range-seek:active::-moz-range-thumb {
     transform: scale(1.25);
-    box-shadow: 0 0 16px rgba(96, 165, 250, 0.7);
+    box-shadow: 0 0 16px color-mix(in srgb, var(--accent) 70%, transparent);
   }
 
   .range-seek:disabled {
@@ -168,41 +208,41 @@
   .range-volume::-webkit-slider-runnable-track {
     height: 4px;
     border-radius: 9999px;
-    background: #334155;
+    background: var(--bg-hover);
   }
 
   .range-volume::-webkit-slider-thumb {
     width: 10px;
     height: 10px;
     border-radius: 9999px;
-    background: #60a5fa;
-    border: 2px solid #93c5fd;
+    background: var(--accent);
+    border: 2px solid var(--accent-hover);
     margin-top: -3px;
     transition: box-shadow 0.2s, transform 0.2s;
   }
 
   .range-volume:hover::-webkit-slider-thumb {
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
     transform: scale(1.1);
   }
 
   .range-volume::-moz-range-track {
     height: 4px;
     border-radius: 9999px;
-    background: #334155;
+    background: var(--bg-hover);
   }
 
   .range-volume::-moz-range-thumb {
     width: 10px;
     height: 10px;
     border-radius: 9999px;
-    background: #60a5fa;
-    border: 2px solid #93c5fd;
+    background: var(--accent);
+    border: 2px solid var(--accent-hover);
     transition: box-shadow 0.2s, transform 0.2s;
   }
 
   .range-volume:hover::-moz-range-thumb {
-    box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 50%, transparent);
     transform: scale(1.1);
   }
 }
@@ -210,7 +250,7 @@
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #334155 transparent;
+    scrollbar-color: var(--bg-hover) transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -223,12 +263,12 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: #334155;
+    background-color: var(--bg-hover);
     border-radius: 3px;
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    background-color: #475569;
+    background-color: var(--text-muted);
   }
 
   .text-gradient {
@@ -236,15 +276,15 @@
   }
 
   .glow {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    box-shadow: var(--shadow-glow);
   }
 
   .glow-lg {
-    box-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
+    box-shadow: var(--shadow-glow-lg);
   }
 
   .skeleton {
-    background: linear-gradient(90deg, #1e293b 25%, #253347 50%, #1e293b 75%);
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s ease-in-out infinite;
     border-radius: 0.5rem;
@@ -255,3 +295,32 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Theme-aware utility classes */
+.bg-theme-root { background-color: var(--bg-root); }
+.bg-theme-surface { background-color: var(--bg-surface); }
+.bg-theme-elevated { background-color: var(--bg-elevated); }
+.bg-theme-root\/60 { background-color: color-mix(in srgb, var(--bg-root) 60%, transparent); }
+.bg-theme-root\/80 { background-color: color-mix(in srgb, var(--bg-root) 80%, transparent); }
+.bg-theme-root\/90 { background-color: color-mix(in srgb, var(--bg-root) 90%, transparent); }
+.bg-theme-surface\/50 { background-color: color-mix(in srgb, var(--bg-surface) 50%, transparent); }
+.bg-theme-surface\/90 { background-color: color-mix(in srgb, var(--bg-surface) 90%, transparent); }
+.bg-theme-surface\/95 { background-color: color-mix(in srgb, var(--bg-surface) 95%, transparent); }
+.bg-theme-elevated\/50 { background-color: color-mix(in srgb, var(--bg-elevated) 50%, transparent); }
+.bg-theme-hover { background-color: var(--bg-hover); }
+.bg-theme-accent { background-color: var(--accent); }
+.bg-theme-accent\/5 { background-color: color-mix(in srgb, var(--accent) 5%, transparent); }
+.bg-theme-accent\/10 { background-color: color-mix(in srgb, var(--accent) 10%, transparent); }
+.bg-theme-accent\/20 { background-color: color-mix(in srgb, var(--accent) 20%, transparent); }
+.text-theme-primary { color: var(--text-primary); }
+.text-theme-secondary { color: var(--text-secondary); }
+.text-theme-muted { color: var(--text-muted); }
+.text-theme-accent { color: var(--accent); }
+.border-theme { border-color: var(--border); }
+.border-theme-subtle { border-color: var(--border-subtle); }
+.border-theme-accent { border-color: var(--accent); }
+.ring-theme-accent { --tw-ring-color: var(--accent); }
+.text-on-accent { color: var(--text-on-accent); }
+.from-theme-root\/90 { --tw-gradient-from: color-mix(in srgb, var(--bg-root) 90%, transparent); }
+.via-theme-root\/50 { --tw-gradient-via: color-mix(in srgb, var(--bg-root) 50%, transparent); }
+.placeholder-theme-muted::placeholder { color: var(--text-muted); }

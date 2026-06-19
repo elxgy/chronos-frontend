@@ -361,14 +361,14 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     return (
       <div
         id="video-container"
-        className="relative w-full min-h-[200px] aspect-video bg-dark-800/80 rounded-xl border border-dark-700 overflow-hidden flex items-center justify-center"
+        className="relative w-full min-h-[200px] aspect-video bg-theme-elevated/80 rounded-xl border-2 border-theme overflow-hidden flex items-center justify-center"
       >
         <div className="text-center px-6 py-8">
-          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-dark-700/80 flex items-center justify-center border border-dark-600">
-            <Play className="w-10 h-10 text-dark-500" />
+          <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-theme-hover/80 flex items-center justify-center border-2 border-theme">
+            <Play className="w-10 h-10 text-theme-primary" />
           </div>
-          <p className="text-dark-300 font-medium">No video playing</p>
-          <p className="text-dark-500 text-sm mt-1 max-w-xs mx-auto">
+          <p className="text-theme-secondary font-medium">No video playing</p>
+          <p className="text-theme-secondary text-sm mt-1 max-w-xs mx-auto">
             Add a YouTube video to start watching together in sync
           </p>
         </div>
@@ -381,7 +381,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   return (
     <div
       id="video-container"
-      className="relative w-full aspect-video bg-dark-800 rounded-xl overflow-hidden group"
+      className="relative w-full aspect-video bg-theme-elevated rounded-xl overflow-hidden group"
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
     >
@@ -408,7 +408,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       />
 
       <div
-        className={`absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-dark-950/90 via-dark-950/50 to-transparent p-4 transition-opacity duration-300 ${
+        className={`absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-theme-root/90 via-theme-root/50 to-transparent p-4 transition-opacity duration-300 ${
           showControls ? "opacity-100" : "opacity-0"
         }`}
       >
@@ -425,7 +425,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onTouchEnd={commitSeek}
             className="range-seek w-full"
           />
-          <div className="flex items-center justify-between text-xs text-dark-300 mt-1">
+          <div className="flex items-center justify-between text-xs text-theme-secondary mt-1">
             <span>{formatTime(progressTime)}</span>
             <span>{formatTime(duration)}</span>
           </div>
@@ -437,7 +437,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <>
                 <button
                   onClick={isPlaying ? onPause : onPlay}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
                 >
                   {isPlaying ? (
                     <Pause className="w-5 h-5" />
@@ -447,7 +447,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </button>
                 <button
                   onClick={onSkip}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
+                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
                 >
                   <SkipForward className="w-5 h-5" />
                 </button>
@@ -459,7 +459,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={toggleMute}
-                className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
+                className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
                 aria-label={volume === 0 ? "Unmute" : "Mute"}
               >
                 {volume === 0 ? (
@@ -482,7 +482,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             </div>
             <button
               onClick={handleFullscreen}
-              className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-dark-800/80 hover:bg-dark-700 text-dark-200 transition-colors flex items-center justify-center touch-manipulation"
+              className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
@@ -498,7 +498,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       {isHost && isPlaying && (
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse-slow" />
+            <span className="w-2 h-2 bg-yellow-400 rounded-full" />
             Syncing
           </span>
         </div>

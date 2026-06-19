@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, User } from "lucide-react";
 import { Button, Input, Card } from "@/components/common";
 import { AuthLayout } from "@/components/layout";
 import { getApiUrl } from "@/config";
@@ -72,25 +72,19 @@ export const CreateRoomPage: React.FC = () => {
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate("/")}
-            className="p-2 rounded-lg hover:bg-dark-700 text-dark-400 hover:text-dark-200 transition-colors"
+            className="p-2 rounded-lg hover:bg-theme-hover text-theme-muted hover:text-theme-secondary transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-xl font-semibold text-dark-100">Create Room</h1>
-            <p className="text-sm text-dark-400">
+            <h1 className="text-xl font-semibold text-theme-primary">Create Room</h1>
+            <p className="text-sm text-theme-secondary">
               Set up your profile to get started
             </p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center shadow-glow">
-              <Sparkles className="w-10 h-10 text-white" />
-            </div>
-          </div>
-
           <Input
             label="Your Nickname"
             placeholder="Enter a fun nickname"
@@ -124,14 +118,14 @@ export const CreateRoomPage: React.FC = () => {
           </div>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-dark-700">
-          <div className="flex items-center gap-3 p-3 bg-dark-700/50 rounded-lg">
-            <div className="w-10 h-10 rounded-lg bg-primary-500/20 flex items-center justify-center">
-              <span className="text-primary-400 font-semibold">1</span>
+          <div className="mt-6 pt-6 border-t-2 border-theme">
+          <div className="flex items-center gap-3 p-3 bg-theme-elevated/50 rounded-lg">
+            <div className="w-10 h-10 rounded-lg bg-theme-accent/20 flex items-center justify-center">
+              <span className="text-theme-accent font-semibold">1</span>
             </div>
             <div>
-              <p className="text-sm font-medium text-dark-200">Room Host</p>
-              <p className="text-xs text-dark-400">
+              <p className="text-sm font-medium text-theme-secondary">Room Host</p>
+              <p className="text-xs text-theme-muted">
                 You'll control playback for everyone
               </p>
             </div>

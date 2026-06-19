@@ -56,10 +56,10 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             <button
               onClick={isPlaying ? onPause : onPlay}
               className={cn(
-                'min-w-[48px] min-h-[48px] p-4 rounded-full transition-all duration-200 flex items-center justify-center touch-manipulation',
+                'min-w-[48px] min-h-[48px] p-4 rounded-lg transition-all duration-200 flex items-center justify-center touch-manipulation',
                 isPlaying
-                  ? 'bg-dark-700 hover:bg-dark-600 text-dark-200'
-                  : 'bg-primary-600 hover:bg-primary-500 text-white shadow-glow'
+                  ? 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
+                  : 'bg-theme-accent hover:bg-theme-accent text-on-accent shadow-glow'
               )}
             >
               {isPlaying ? (
@@ -71,13 +71,13 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onSkip}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
             >
               <SkipForward className="w-6 h-6" />
             </button>
             <button
               onClick={onSeekBack10}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
               title="Go back 10 seconds"
               aria-label="Go back 10 seconds"
             >
@@ -85,7 +85,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             </button>
             <button
               onClick={onSeekForward10}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
               title="Skip forward 10 seconds"
               aria-label="Skip forward 10 seconds"
             >
@@ -95,10 +95,10 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             <button
               onClick={() => onSetLoop(!loop)}
               className={cn(
-                'min-w-[48px] min-h-[48px] p-4 rounded-full transition-all flex items-center justify-center touch-manipulation',
+                'min-w-[48px] min-h-[48px] p-4 rounded-lg transition-all flex items-center justify-center touch-manipulation',
                 loop
-                  ? 'bg-primary-600 hover:bg-primary-500 text-white'
-                  : 'bg-dark-700 hover:bg-dark-600 text-dark-200'
+                  ? 'bg-theme-accent hover:bg-theme-accent text-on-accent'
+                  : 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
               )}
               title={loop ? 'Loop on: replay current video when it ends' : 'Loop off'}
               aria-label={loop ? 'Loop on' : 'Loop off'}
@@ -108,14 +108,14 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onOpenAddVideo}
-              className="min-w-[48px] min-h-[48px] p-4 rounded-full bg-dark-700 hover:bg-dark-600 text-dark-200 transition-all flex items-center justify-center touch-manipulation"
+              className="min-w-[48px] min-h-[48px] p-4 rounded-lg bg-theme-hover hover:bg-theme-hover text-theme-secondary transition-all flex items-center justify-center touch-manipulation"
               aria-label="Add video"
             >
               <Plus className="w-6 h-6" />
             </button>
           </>
         ) : (
-          <div className="flex items-center gap-3 text-dark-400">
+          <div className="flex items-center gap-3 text-theme-muted">
             <span className="text-sm">
               {isPlaying ? (
                 <span className="flex items-center gap-2">
@@ -126,7 +126,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
                 'Paused'
               )}
             </span>
-            <span className="text-xs text-dark-500">
+            <span className="text-xs text-theme-muted">
               (Host controls playback)
             </span>
           </div>
@@ -235,7 +235,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
         />
 
         {searchResults.length > 0 && (
-          <div className="border border-dark-600 rounded-lg max-h-48 overflow-y-auto">
+          <div className="border-2 border-theme rounded-lg max-h-48 overflow-y-auto">
             {searchResults.map((result) => (
               <button
                 key={result.id}
@@ -245,12 +245,12 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
                   setSearchResults([]);
                   onClose();
                 }}
-                className="w-full flex items-center gap-3 p-2 hover:bg-dark-700/50 transition-colors text-left"
+                className="w-full flex items-center gap-3 p-2 hover:bg-theme-hover/50 transition-colors text-left"
               >
                 <img src={result.thumbnail} alt="" className="w-16 h-10 object-cover rounded" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-dark-200 truncate">{result.title}</p>
-                  <p className="text-xs text-dark-500">{result.channel}</p>
+                  <p className="text-sm text-theme-secondary truncate">{result.title}</p>
+                  <p className="text-xs text-theme-muted">{result.channel}</p>
                 </div>
               </button>
             ))}
@@ -259,7 +259,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
 
         {isSearching && (
           <div className="flex items-center justify-center py-4">
-            <Loader2 className="w-5 h-5 text-primary-400 animate-spin" />
+            <Loader2 className="w-5 h-5 text-theme-accent animate-spin" />
           </div>
         )}
 

@@ -26,26 +26,26 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
       case 'excellent':
         return <Signal className="w-3.5 h-3.5 text-green-400" />;
       case 'good':
-        return <Signal className="w-3.5 h-3.5 text-primary-400" />;
+        return <Signal className="w-3.5 h-3.5 text-theme-accent" />;
       case 'fair':
         return <Signal className="w-3.5 h-3.5 text-yellow-400" />;
       case 'poor':
         return <Signal className="w-3.5 h-3.5 text-red-400" />;
       default:
-        return <WifiOff className="w-3.5 h-3.5 text-dark-400" />;
+        return <WifiOff className="w-3.5 h-3.5 text-theme-muted" />;
     }
   };
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b border-dark-700">
+      <div className="p-4 border-b-2 border-theme">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-primary-400" />
-          <h3 className="font-semibold text-dark-100">Participants</h3>
+          <Users className="w-5 h-5 text-theme-accent" />
+          <h3 className="font-semibold text-theme-primary">Participants</h3>
           <span className="ml-auto badge-primary">{participants.length}</span>
         </div>
         {participants.length > 0 && (
-          <p className="text-xs text-dark-500 mt-1">
+          <p className="text-xs text-theme-muted mt-1">
             {participants.length} watching
           </p>
         )}
@@ -54,22 +54,22 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {participants.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-dark-700/80 flex items-center justify-center">
-              <Users className="w-7 h-7 text-dark-500" />
+            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-theme-hover/80 flex items-center justify-center">
+              <Users className="w-7 h-7 text-theme-muted" />
             </div>
-            <p className="text-dark-300 font-medium">No participants yet</p>
-            <p className="text-dark-500 text-sm mt-1">
+            <p className="text-theme-secondary font-medium">No participants yet</p>
+            <p className="text-theme-secondary text-sm mt-1">
               Share the room code to invite others
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-dark-700">
+          <ul className="divide-y divide-theme">
             {participants.map((participant) => (
               <li
                 key={participant.id}
                 className={cn(
-                  'p-3 hover:bg-dark-700/50 transition-colors',
-                  currentUserId === participant.id && 'bg-primary-500/5'
+                  'p-3 hover:bg-theme-hover/50 transition-colors',
+                  currentUserId === participant.id && 'bg-theme-accent/5'
                 )}
               >
                 <div className="flex items-center gap-3">
@@ -79,24 +79,24 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
                     </div>
                     <div
                       className={cn(
-                        'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-dark-800',
+                        'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-theme',
                         participant.connected
                           ? 'bg-green-500'
-                          : 'bg-dark-500'
+                          : 'bg-theme-muted'
                       )}
                     />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-dark-200 truncate">
+                      <span className="font-medium text-theme-secondary truncate">
                         {participant.nickname}
                       </span>
                       {participant.isHost && (
                         <Crown className="w-4 h-4 text-yellow-400 flex-shrink-0" />
                       )}
                       {currentUserId === participant.id && (
-                        <span className="text-xs text-dark-400">(you)</span>
+                        <span className="text-xs text-theme-muted">(you)</span>
                       )}
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -111,7 +111,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
                           >
                             {getQualityLabel(participant.quality)}
                           </span>
-                          <span className="text-xs text-dark-500">
+                           <span className="text-xs text-theme-muted">
                             ({participant.latencyMs.toFixed(0)}ms)
                           </span>
                         </>
@@ -123,7 +123,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
                     {participant.isActive ? (
                       <Circle className="w-2 h-2 fill-green-500 text-green-500" />
                     ) : (
-                      <Circle className="w-2 h-2 fill-dark-500 text-dark-500" />
+                      <Circle className="w-2 h-2 fill-theme-muted text-theme-muted" />
                     )}
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export const QualityIndicator: React.FC<QualityIndicatorProps> = ({
           {!compact && <span className={cn('text-xs', getQualityColor(quality))}>{latencyMs.toFixed(0)}ms</span>}
         </>
       ) : (
-        <WifiOff className="w-3.5 h-3.5 text-dark-400" />
+        <WifiOff className="w-3.5 h-3.5 text-theme-muted" />
       )}
     </div>
   );

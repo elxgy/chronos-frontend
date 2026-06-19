@@ -158,8 +158,8 @@ export const RoomPage: React.FC = () => {
         maxWidth="full"
       >
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-8 h-8 text-primary-400 animate-spin" />
-          <p className="text-dark-400">Redirecting to home...</p>
+          <Loader2 className="w-8 h-8 text-theme-accent animate-spin" />
+          <p className="text-theme-muted">Redirecting to home...</p>
         </div>
       </MainLayout>
     );
@@ -167,8 +167,8 @@ export const RoomPage: React.FC = () => {
 
   if (phase === "initial" || phase === "bootstrapping") {
     return (
-    <div className="h-screen bg-dark-950 flex flex-col overflow-hidden">
-        <div className="h-14 bg-dark-900/90 border-b border-dark-700" />
+    <div className="h-screen bg-theme-root flex flex-col overflow-hidden">
+        <div className="h-14 bg-theme-surface/90 border-b-2 border-theme" />
         <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
           <div className="flex-1 space-y-4">
             <div className="skeleton aspect-video w-full" />
@@ -216,10 +216,10 @@ export const RoomPage: React.FC = () => {
               <AlertCircle className="w-7 h-7 text-red-400" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-dark-100 mb-1">
+              <h2 className="text-lg font-semibold text-theme-primary mb-1">
                 Could not load room
               </h2>
-              <p className="text-dark-400 text-sm">{loadError}</p>
+              <p className="text-theme-muted text-sm">{loadError}</p>
             </div>
             <Button
               variant="primary"
@@ -235,7 +235,7 @@ export const RoomPage: React.FC = () => {
   }
 
   return (
-    <div className="h-screen bg-dark-950 flex flex-col overflow-hidden">
+    <div className="h-screen bg-theme-root flex flex-col overflow-hidden">
       <Header
         roomCode={code}
         participantCount={participants.length}
@@ -298,10 +298,10 @@ export const RoomPage: React.FC = () => {
                     />
                   )}
                   <div className="min-w-0 flex-1">
-                    <h2 className="text-lg font-semibold text-dark-100 line-clamp-2">
+                    <h2 className="text-lg font-semibold text-theme-primary line-clamp-2">
                       {roomState.currentVideo.title}
                     </h2>
-                    <p className="text-sm text-dark-400 mt-0.5">
+                    <p className="text-sm text-theme-muted mt-0.5">
                       Added by {roomState.currentVideo.addedByName}
                     </p>
                   </div>
@@ -330,20 +330,20 @@ export const RoomPage: React.FC = () => {
 
         <aside
           className={cn(
-            "border-l border-dark-700 bg-dark-900/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0",
+            "border-l-2 border-theme bg-theme-surface/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0",
             showSidebar
               ? "fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-96 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96"
               : "hidden",
           )}
         >
-          <div className="flex items-center border-b border-dark-700 shrink-0">
+          <div className="flex items-center border-b-2 border-theme shrink-0">
             <button
               onClick={() => setSidebarTab("queue")}
               className={cn(
                 "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
                 sidebarTab === "queue"
-                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
-                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
+                  ? "text-theme-accent border-b-[3px] border-theme-accent bg-theme-accent/5"
+                  : "text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50",
               )}
             >
               Queue ({roomState.queue.length})
@@ -353,8 +353,8 @@ export const RoomPage: React.FC = () => {
               className={cn(
                 "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
                 sidebarTab === "participants"
-                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
-                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
+                  ? "text-theme-accent border-b-[3px] border-theme-accent bg-theme-accent/5"
+                  : "text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50",
               )}
             >
               People ({participants.length})
@@ -364,15 +364,15 @@ export const RoomPage: React.FC = () => {
               className={cn(
                 "flex-1 py-3.5 px-4 text-sm font-medium transition-colors min-h-[44px] touch-manipulation",
                 sidebarTab === "chat"
-                  ? "text-primary-400 border-b-2 border-primary-400 bg-primary-500/5"
-                  : "text-dark-400 hover:text-dark-200 hover:bg-dark-800/50",
+                  ? "text-theme-accent border-b-[3px] border-theme-accent bg-theme-accent/5"
+                  : "text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50",
               )}
             >
               Chat
             </button>
             <button
               onClick={() => setShowSidebar(false)}
-              className="p-3 text-dark-400 hover:text-dark-200 hover:bg-dark-800/50 transition-colors touch-manipulation shrink-0"
+              className="p-3 text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50 transition-colors touch-manipulation shrink-0"
               aria-label="Hide panel"
             >
               <X className="w-5 h-5" />
@@ -413,7 +413,7 @@ export const RoomPage: React.FC = () => {
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-dark-800 border border-dark-600 px-4 py-2.5 rounded-xl text-sm font-medium text-dark-200 hover:text-dark-50 hover:bg-dark-700 transition-colors touch-manipulation shadow-lg"
+            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-theme-elevated border-2 border-theme px-4 py-2.5 rounded-xl text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-hover transition-colors touch-manipulation shadow-lg"
             aria-label="Show panel"
           >
             Queue & People
@@ -421,7 +421,7 @@ export const RoomPage: React.FC = () => {
         )}
         {showSidebar && (
           <div
-            className="fixed inset-0 z-20 bg-dark-950/60 backdrop-blur-sm lg:hidden"
+            className="fixed inset-0 z-20 bg-theme-root/60 backdrop-blur-sm lg:hidden"
             style={{ top: "var(--header-height)" }}
             onClick={() => setShowSidebar(false)}
             aria-hidden="true"

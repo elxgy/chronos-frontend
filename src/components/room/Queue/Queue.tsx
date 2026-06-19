@@ -175,10 +175,10 @@ export const Queue: React.FC<QueueProps> = ({
 
   return (
     <div className="h-full flex flex-col">
-      <div className="p-4 border-b border-dark-700">
+      <div className="p-4 border-b-2 border-theme">
         <div className="flex items-center gap-2 mb-4">
-          <ListMusic className="w-5 h-5 text-primary-400" />
-          <h3 className="font-semibold text-dark-100">Queue</h3>
+          <ListMusic className="w-4 h-4 text-theme-accent" />
+          <h3 className="font-semibold text-theme-primary">Queue</h3>
           <span className="ml-auto badge-primary">{videos.length}</span>
         </div>
 
@@ -190,8 +190,8 @@ export const Queue: React.FC<QueueProps> = ({
                 className={cn(
                   "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0",
                   autoplay
-                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/40 hover:bg-primary-600/30"
-                    : "bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300",
+                    ? "bg-theme-accent/20 text-theme-accent border border-theme-accent/40 hover:bg-theme-accent/30"
+                    : "bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-theme-secondary",
                 )}
                 title={autoplay ? "Autoplay on" : "Autoplay off"}
                 aria-label={autoplay ? "Autoplay on" : "Autoplay off"}
@@ -208,8 +208,8 @@ export const Queue: React.FC<QueueProps> = ({
                   setTimeout(() => setJustShuffled(false), 400);
                 }}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-dark-300",
-                  justShuffled && "ring-2 ring-primary-400 shadow-lg shadow-primary-500/50",
+                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-theme-secondary",
+                  justShuffled && "ring-2 ring-theme-accent shadow-lg shadow-theme-accent/50",
                 )}
                 title="Shuffle queue"
                 aria-label="Shuffle queue"
@@ -222,7 +222,7 @@ export const Queue: React.FC<QueueProps> = ({
           {isHost && onClearQueue && videos.length > 0 && (
             <button
               onClick={() => setShowClearConfirm(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-dark-800 text-dark-400 border border-dark-600 hover:bg-dark-700 hover:text-red-400 hover:border-red-500/40"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-red-400 hover:border-red-500/40"
               title="Clear queue"
               aria-label="Clear queue"
             >
@@ -263,7 +263,7 @@ export const Queue: React.FC<QueueProps> = ({
                     setSearchResults([]);
                     setError("");
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-dark-400 hover:text-dark-200"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-theme-muted hover:text-theme-secondary"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -281,13 +281,13 @@ export const Queue: React.FC<QueueProps> = ({
           </div>
 
           {searchResults.length > 0 && (
-            <div className="max-h-60 overflow-y-auto scrollbar-thin rounded-lg border border-dark-600 bg-dark-800 divide-y divide-dark-700">
+            <div className="max-h-60 overflow-y-auto scrollbar-thin rounded-lg border-2 border-theme bg-theme-elevated divide-y divide-theme">
               {searchResults.map((result) => (
                 <button
                   key={result.id}
                   onClick={() => handleAddFromSearch(result)}
                   disabled={isAdding}
-                  className="w-full flex items-center gap-3 p-2 hover:bg-dark-700/50 transition-colors text-left disabled:opacity-50"
+                  className="w-full flex items-center gap-3 p-2 hover:bg-theme-hover/50 transition-colors text-left disabled:opacity-50"
                 >
                   {result.thumbnail && (
                     <img
@@ -297,8 +297,8 @@ export const Queue: React.FC<QueueProps> = ({
                     />
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm text-dark-100 line-clamp-1">{result.title}</p>
-                    <p className="text-xs text-dark-400 truncate">{result.channel}</p>
+                    <p className="text-sm text-theme-primary line-clamp-1">{result.title}</p>
+                    <p className="text-xs text-theme-muted truncate">{result.channel}</p>
                   </div>
                 </button>
               ))}
@@ -306,7 +306,7 @@ export const Queue: React.FC<QueueProps> = ({
           )}
 
           {isSearching && (
-            <div className="flex items-center gap-2 text-xs text-dark-400 px-1">
+            <div className="flex items-center gap-2 text-xs text-theme-muted px-1">
               <Search className="w-3 h-3 animate-pulse" />
               Searching...
             </div>
@@ -317,27 +317,27 @@ export const Queue: React.FC<QueueProps> = ({
       <div className="flex-1 overflow-y-auto scrollbar-thin">
         {videos.length === 0 ? (
           <div className="p-8 text-center">
-            <div className="w-14 h-14 mx-auto mb-4 rounded-xl bg-dark-700/80 flex items-center justify-center">
-              <ListMusic className="w-7 h-7 text-dark-500" />
+            <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-theme-hover/80 flex items-center justify-center">
+              <ListMusic className="w-6 h-6 text-theme-muted" />
             </div>
-            <p className="text-dark-300 font-medium">Queue is empty</p>
-            <p className="text-dark-500 text-sm mt-1">
+            <p className="text-theme-secondary font-medium">Queue is empty</p>
+            <p className="text-theme-secondary text-sm mt-1">
               Add your first video above to watch together
             </p>
           </div>
         ) : (
-          <ul className="divide-y divide-dark-700">
+          <ul className="divide-y divide-theme">
             {videos.map((video, index) => (
               <li
                 key={`${video.id}-${index}`}
                 className={cn(
                   "p-3 transition-all duration-150 group animate-slide-up",
                   dragIndex === index
-                    ? "opacity-40 ring-2 ring-primary-400/50"
-                    : "hover:bg-dark-700/50",
-                  currentVideoId === video.id && "bg-primary-500/10",
+                    ? "opacity-40 ring-2 ring-theme-accent/50"
+                    : "hover:bg-theme-hover/50",
+                  currentVideoId === video.id && "bg-theme-accent/10",
                   overIndex === index && dragIndex !== null && dragIndex !== index
-                    ? "border-t-2 border-primary-500"
+                    ? "border-t-2 border-theme-accent"
                     : "",
                 )}
                 draggable={isHost}
@@ -350,12 +350,12 @@ export const Queue: React.FC<QueueProps> = ({
               >
                 <div className="flex items-center gap-3">
                   {isHost && (
-                    <div className="cursor-grab active:cursor-grabbing text-dark-500 group-hover:text-dark-400">
+                    <div className="cursor-grab active:cursor-grabbing text-theme-muted group-hover:text-theme-secondary">
                       <GripVertical className="w-4 h-4" />
                     </div>
                   )}
 
-                  <div className="relative w-20 h-12 bg-dark-700 rounded overflow-hidden flex-shrink-0">
+                  <div className="relative w-20 h-12 bg-theme-hover rounded overflow-hidden flex-shrink-0">
                     {video.thumbnail && (
                       <img
                         src={video.thumbnail}
@@ -364,17 +364,17 @@ export const Queue: React.FC<QueueProps> = ({
                       />
                     )}
                     {currentVideoId === video.id && (
-                      <div className="absolute inset-0 bg-primary-500/30 flex items-center justify-center">
-                        <PlayCircle className="w-6 h-6 text-primary-400" />
+                      <div className="absolute inset-0 bg-theme-accent/30 flex items-center justify-center">
+                        <PlayCircle className="w-6 h-6 text-theme-accent" />
                       </div>
                     )}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-dark-200 truncate text-sm">
+                    <p className="font-medium text-theme-secondary truncate text-sm">
                       {video.title}
                     </p>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-dark-400">
+                    <div className="flex items-center gap-2 mt-1 text-xs text-theme-muted">
                       <span>{video.addedByName}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
@@ -390,7 +390,7 @@ export const Queue: React.FC<QueueProps> = ({
                         e.stopPropagation();
                         onRemoveVideo(video.id);
                       }}
-                      className="p-2 text-dark-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-2 text-theme-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
