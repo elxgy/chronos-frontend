@@ -24,13 +24,13 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
   const getQualityIcon = (quality: ConnectionQuality) => {
     switch (quality) {
       case 'excellent':
-        return <Signal className="w-3.5 h-3.5 text-green-400" />;
+        return <Signal className="w-3.5 h-3.5 text-status-success" />;
       case 'good':
         return <Signal className="w-3.5 h-3.5 text-theme-accent" />;
       case 'fair':
-        return <Signal className="w-3.5 h-3.5 text-yellow-400" />;
+        return <Signal className="w-3.5 h-3.5 text-status-warning" />;
       case 'poor':
-        return <Signal className="w-3.5 h-3.5 text-red-400" />;
+        return <Signal className="w-3.5 h-3.5 text-status-error" />;
       default:
         return <WifiOff className="w-3.5 h-3.5 text-theme-muted" />;
     }
@@ -81,7 +81,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
                       className={cn(
                         'absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-theme',
                         participant.connected
-                          ? 'bg-green-500'
+                          ? 'bg-status-success'
                           : 'bg-theme-muted'
                       )}
                     />
@@ -93,7 +93,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
                         {participant.nickname}
                       </span>
                       {participant.isHost && (
-                        <Crown className="w-4 h-4 text-yellow-400 flex-shrink-0" />
+                        <Crown className="w-4 h-4 text-status-warning flex-shrink-0" />
                       )}
                       {currentUserId === participant.id && (
                         <span className="text-xs text-theme-muted">(you)</span>
@@ -121,7 +121,7 @@ export const ParticipantList: React.FC<ParticipantListProps> = ({
 
                   <div className="flex items-center gap-2">
                     {participant.isActive ? (
-                      <Circle className="w-2 h-2 fill-green-500 text-green-500" />
+                      <Circle className="w-2 h-2 fill-status-success text-status-success" />
                     ) : (
                       <Circle className="w-2 h-2 fill-theme-muted text-theme-muted" />
                     )}

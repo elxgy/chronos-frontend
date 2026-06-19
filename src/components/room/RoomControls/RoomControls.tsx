@@ -58,8 +58,8 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
               className={cn(
                 'control-btn duration-200',
                 isPlaying
-                  ? 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
-                  : 'bg-theme-accent hover:bg-theme-accent text-on-accent shadow-glow'
+                  ? 'bg-theme-hover hover:brightness-125 text-theme-secondary'
+                  : 'bg-theme-accent hover:brightness-110 text-on-accent shadow-glow'
               )}
             >
               {isPlaying ? (
@@ -71,13 +71,13 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onSkip}
-              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
+              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
             >
               <SkipForward className="w-6 h-6" />
             </button>
             <button
               onClick={onSeekBack10}
-              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
+              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
               title="Go back 10 seconds"
               aria-label="Go back 10 seconds"
             >
@@ -85,7 +85,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             </button>
             <button
               onClick={onSeekForward10}
-              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
+              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
               title="Skip forward 10 seconds"
               aria-label="Skip forward 10 seconds"
             >
@@ -97,8 +97,8 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
               className={cn(
                 'control-btn',
                 loop
-                  ? 'bg-theme-accent hover:bg-theme-accent text-on-accent'
-                  : 'bg-theme-hover hover:bg-theme-hover text-theme-secondary'
+                  ? 'bg-theme-accent hover:brightness-110 text-on-accent'
+                  : 'bg-theme-hover hover:brightness-125 text-theme-secondary'
               )}
               title={loop ? 'Loop on: replay current video when it ends' : 'Loop off'}
               aria-label={loop ? 'Loop on' : 'Loop off'}
@@ -108,7 +108,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
 
             <button
               onClick={onOpenAddVideo}
-              className="control-btn bg-theme-hover hover:bg-theme-hover text-theme-secondary"
+              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
               aria-label="Add video"
             >
               <Plus className="w-6 h-6" />
@@ -119,7 +119,7 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             <span className="text-sm">
               {isPlaying ? (
                 <span className="flex items-center gap-2">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                  <span className="w-2 h-2 bg-status-success rounded-full animate-pulse" />
                   Playing
                 </span>
               ) : (

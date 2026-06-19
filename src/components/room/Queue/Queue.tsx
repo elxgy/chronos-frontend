@@ -188,10 +188,10 @@ export const Queue: React.FC<QueueProps> = ({
               <button
                 onClick={() => onSetAutoplay(!autoplay)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0",
+                  "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 touch-manipulation flex-shrink-0",
                   autoplay
-                    ? "bg-theme-accent/20 text-theme-accent border border-theme-accent/40 hover:bg-theme-accent/30"
-                    : "bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-theme-secondary",
+                    ? "bg-theme-accent/20 text-theme-accent border border-theme-accent/40 hover:bg-theme-accent/30 hover:brightness-110"
+                    : "bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-theme-secondary hover:brightness-125 active:scale-95",
                 )}
                 title={autoplay ? "Autoplay on" : "Autoplay off"}
                 aria-label={autoplay ? "Autoplay on" : "Autoplay off"}
@@ -222,7 +222,7 @@ export const Queue: React.FC<QueueProps> = ({
           {isHost && onClearQueue && videos.length > 0 && (
             <button
               onClick={() => setShowClearConfirm(true)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-red-400 hover:border-red-500/40"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors touch-manipulation flex-shrink-0 bg-theme-elevated text-theme-muted border border-theme hover:bg-theme-hover hover:text-status-error hover:border-status-error"
               title="Clear queue"
               aria-label="Clear queue"
             >
@@ -390,7 +390,7 @@ export const Queue: React.FC<QueueProps> = ({
                         e.stopPropagation();
                         onRemoveVideo(video.id);
                       }}
-                      className="p-2 text-theme-muted hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-2 text-theme-muted hover:text-status-error hover:bg-status-error/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

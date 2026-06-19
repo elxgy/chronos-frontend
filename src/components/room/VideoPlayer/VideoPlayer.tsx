@@ -437,7 +437,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               <>
                 <button
                   onClick={isPlaying ? onPause : onPlay}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
+                  className="overlay-btn"
                 >
                   {isPlaying ? (
                     <Pause className="w-5 h-5" />
@@ -447,7 +447,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 </button>
                 <button
                   onClick={onSkip}
-                  className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
+                  className="overlay-btn"
                 >
                   <SkipForward className="w-5 h-5" />
                 </button>
@@ -459,7 +459,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 onClick={toggleMute}
-                className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
+                className="overlay-btn"
                 aria-label={volume === 0 ? "Unmute" : "Mute"}
               >
                 {volume === 0 ? (
@@ -482,7 +482,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             </div>
             <button
               onClick={handleFullscreen}
-              className="min-w-[44px] min-h-[44px] p-2 rounded-lg bg-theme-elevated/80 hover:bg-theme-hover text-theme-secondary transition-colors flex items-center justify-center touch-manipulation"
+              className="overlay-btn"
               aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             >
               {isFullscreen ? (
@@ -497,8 +497,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
       {isHost && isPlaying && (
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-30">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 text-xs font-medium">
-            <span className="w-2 h-2 bg-yellow-400 rounded-full" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-status-warning/10 border border-status-warning text-status-warning text-xs font-medium">
+            <span className="w-2 h-2 bg-status-warning rounded-full" />
             Syncing
           </span>
         </div>

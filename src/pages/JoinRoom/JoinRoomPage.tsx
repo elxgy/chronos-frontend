@@ -81,7 +81,7 @@ export const JoinRoomPage: React.FC = () => {
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate("/")}
-            className="p-2 rounded-lg hover:bg-theme-hover text-theme-muted hover:text-theme-secondary transition-colors"
+            className="p-2 rounded-lg hover:bg-theme-hover hover:brightness-125 active:scale-90 text-theme-muted hover:text-theme-secondary transition-all duration-150"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

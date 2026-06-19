@@ -61,11 +61,21 @@
   }
 
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-500 focus:ring-red-500;
+    @apply btn;
+    background-color: var(--status-error);
+    color: white;
+  }
+  .btn-danger:hover {
+    filter: brightness(1.1);
   }
 
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-500 focus:ring-green-500;
+    @apply btn;
+    background-color: var(--status-success);
+    color: white;
+  }
+  .btn-success:hover {
+    filter: brightness(1.1);
   }
 
   .input {
@@ -76,7 +86,36 @@
   }
 
   .control-btn {
-    @apply min-w-[48px] min-h-[48px] p-4 rounded-full transition-all flex items-center justify-center touch-manipulation;
+    @apply min-w-[48px] min-h-[48px] p-4 rounded-full transition-all duration-150 flex items-center justify-center touch-manipulation;
+  }
+  .control-btn:hover {
+    filter: brightness(1.2);
+  }
+  .control-btn:active {
+    transform: scale(0.92);
+    filter: brightness(0.9);
+  }
+
+  .overlay-btn {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    background-color: color-mix(in srgb, var(--bg-elevated) 80%, transparent);
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+  .overlay-btn:hover {
+    background-color: var(--bg-hover);
+    filter: brightness(1.15);
+  }
+  .overlay-btn:active {
+    transform: scale(0.9);
+    filter: brightness(0.85);
   }
   .input::placeholder {
     color: var(--text-muted);
@@ -112,15 +151,21 @@
   }
 
   .badge-success {
-    @apply badge bg-green-500/20 text-green-400;
+    @apply badge;
+    background-color: var(--status-success-bg);
+    color: var(--status-success);
   }
 
   .badge-warning {
-    @apply badge bg-yellow-500/20 text-yellow-400;
+    @apply badge;
+    background-color: var(--status-warning-bg);
+    color: var(--status-warning);
   }
 
   .badge-error {
-    @apply badge bg-red-500/20 text-red-400;
+    @apply badge;
+    background-color: var(--status-error-bg);
+    color: var(--status-error);
   }
 
   .range-seek {
@@ -324,7 +369,20 @@
 .border-theme-subtle { border-color: var(--border-subtle); }
 .border-theme-accent { border-color: var(--accent); }
 .ring-theme-accent { --tw-ring-color: var(--accent); }
+.ring-theme-accent\/50 { --tw-ring-color: color-mix(in srgb, var(--accent) 50%, transparent); }
 .text-on-accent { color: var(--text-on-accent); }
+.text-status-warning { color: var(--status-warning); }
+.bg-status-warning { background-color: var(--status-warning); }
+.bg-status-warning\/10 { background-color: var(--status-warning-bg); }
+.border-status-warning { border-color: var(--status-warning-border); }
+.text-status-error { color: var(--status-error); }
+.bg-status-error { background-color: var(--status-error); }
+.bg-status-error\/10 { background-color: var(--status-error-bg); }
+.border-status-error { border-color: var(--status-error-border); }
+.text-status-success { color: var(--status-success); }
+.bg-status-success { background-color: var(--status-success); }
+.bg-status-success\/10 { background-color: var(--status-success-bg); }
+.border-status-success { border-color: var(--status-success-border); }
 .from-theme-root\/90 { --tw-gradient-from: color-mix(in srgb, var(--bg-root) 90%, transparent); }
 .via-theme-root\/50 { --tw-gradient-via: color-mix(in srgb, var(--bg-root) 50%, transparent); }
 .placeholder-theme-muted::placeholder { color: var(--text-muted); }

@@ -75,7 +75,7 @@ export const HomePage: React.FC = () => {
 
         <div className="text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-theme-elevated rounded-lg border border-theme">
-            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+            <span className="w-2 h-2 bg-status-success rounded-full animate-pulse" />
             <span className="text-sm text-theme-secondary">
               Real-time sync with{" "}
               <span className="text-theme-accent">up to 8 participants</span>

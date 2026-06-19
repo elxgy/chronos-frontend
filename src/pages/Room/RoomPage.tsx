@@ -212,8 +212,8 @@ export const RoomPage: React.FC = () => {
       >
         <div className="w-full max-w-md p-6 card">
           <div className="flex flex-col items-center gap-4 text-center">
-            <div className="w-14 h-14 rounded-full bg-red-500/20 flex items-center justify-center">
-              <AlertCircle className="w-7 h-7 text-red-400" />
+            <div className="w-14 h-14 rounded-full bg-status-error/10 flex items-center justify-center">
+              <AlertCircle className="w-7 h-7 text-status-error" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-theme-primary mb-1">
@@ -252,16 +252,16 @@ export const RoomPage: React.FC = () => {
         variant="danger"
       />
       {phase === "recovering" && (
-        <div className="flex items-center gap-2 px-4 py-3 text-sm text-yellow-300 bg-yellow-500/10 border-b border-yellow-500/20 shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 text-sm text-status-warning bg-status-warning/10 border-b border-status-warning shrink-0">
           <Loader2 className="w-4 h-4 animate-spin flex-shrink-0" />
           <span>Reconnecting... Attempt {reconnectAttempt} of 5</span>
         </div>
       )}
       {roomError && phase !== "recovering" && (
-        <div className="flex items-center gap-2 px-4 py-3 text-sm text-red-300 bg-red-500/10 border-b border-red-500/20 shrink-0">
+        <div className="flex items-center gap-2 px-4 py-3 text-sm text-status-error bg-status-error/10 border-b border-status-error shrink-0">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{roomError}</span>
-          <button onClick={manualReconnect} className="ml-auto px-3 py-1 text-xs font-medium bg-red-500/20 hover:bg-red-500/30 rounded-lg transition-colors">
+          <button onClick={manualReconnect} className="ml-auto px-3 py-1 text-xs font-medium bg-status-error/10 hover:bg-status-error/20 rounded-lg transition-colors">
             Reconnect
           </button>
         </div>
@@ -367,7 +367,7 @@ export const RoomPage: React.FC = () => {
             </button>
             <button
               onClick={() => setShowSidebar(false)}
-              className="p-3 text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50 transition-colors touch-manipulation shrink-0"
+              className="p-3 text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated/50 active:scale-90 transition-all duration-150 touch-manipulation shrink-0"
               aria-label="Hide panel"
             >
               <X className="w-5 h-5" />
@@ -408,7 +408,7 @@ export const RoomPage: React.FC = () => {
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-theme-elevated border-2 border-theme px-4 py-2.5 rounded-xl text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-hover transition-colors touch-manipulation shadow-lg"
+            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-theme-elevated border-2 border-theme px-4 py-2.5 rounded-xl text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-hover hover:brightness-125 active:scale-95 transition-all duration-150 touch-manipulation shadow-lg"
             aria-label="Show panel"
           >
             Queue & People

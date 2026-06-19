@@ -48,7 +48,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
               'input',
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
-              error && 'border-red-500 focus:ring-red-500',
+              error && 'border-status-error focus:ring-status-error',
               className
             )}
             {...props}
@@ -63,7 +63,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <p
             className={cn(
               'mt-1.5 text-sm',
-              error ? 'text-red-400' : 'text-theme-muted'
+              error ? 'text-status-error' : 'text-theme-muted'
             )}
           >
             {error || helperText}

@@ -78,7 +78,7 @@ export const Modal: React.FC<ModalProps> = ({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="min-w-[44px] min-h-[44px] p-2 -m-2 flex items-center justify-center text-theme-muted hover:text-theme-secondary hover:bg-theme-hover rounded-lg transition-colors touch-manipulation"
+                className="min-w-[44px] min-h-[44px] p-2 -m-2 flex items-center justify-center text-theme-muted hover:text-theme-secondary hover:bg-theme-hover active:scale-90 rounded-lg transition-all duration-150 touch-manipulation"
                 aria-label="Close"
               >
                 <X className="w-5 h-5" />
