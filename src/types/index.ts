@@ -7,6 +7,8 @@ export interface Video {
   title: string;
   thumbnail: string;
   duration: number;
+  isLive: boolean;
+  liveStatus: 'none' | 'live' | 'upcoming' | 'ended';
   addedBy: UserID;
   addedAt: string;
   addedByName: string;
@@ -40,6 +42,7 @@ export interface RoomState {
   anchorPosition?: number;
   anchorUpdatedAt?: string;
   playbackState: PlaybackState;
+  syncMode: 'position' | 'live_edge';
   skipEpoch: number;
   stateVersion: number;
   queue: Video[];
@@ -121,6 +124,7 @@ export interface SyncStateMessage {
   currentTime: number;
   isPlaying: boolean;
   playbackState: PlaybackState;
+  syncMode: 'position' | 'live_edge';
   skipEpoch: number;
   stateVersion: number;
   timestamp: string;

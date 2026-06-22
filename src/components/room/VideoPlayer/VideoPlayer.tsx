@@ -29,6 +29,7 @@ interface VideoPlayerProps {
   stateVersion: number;
   isPlaying: boolean;
   isHost: boolean;
+  syncMode?: 'position' | 'live_edge';
   onReady?: (player: YouTubePlayer) => void;
   onStateChange?: (state: number) => void;
   onSeek: (time: number) => void;
@@ -43,6 +44,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
   stateVersion,
   isPlaying,
   isHost,
+  syncMode = 'position',
   onReady = () => {},
   onStateChange = () => {},
   onSeek,
@@ -190,6 +192,10 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (isHost) {
       return;
     }
+    if (syncMode === 'live_edge') {
+      playerRef.current.seekTo(-1, true);
+      return;
+    }
     if (Date.now() < syncSettleUntilRef.current) {
       return;
     }
@@ -198,7 +204,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
       currentTime,
       isPlaying ? DRIFT_TOLERANCE_SEC : PAUSE_SYNC_TOLERANCE_SEC,
     );
-  }, [currentTime, isPlaying, seekingTime, isHost]);
+  }, [currentTime, isPlaying, seekingTime, isHost, syncMode]);
 
   useEffect(() => {
     if (seekingTime !== null) {
@@ -419,15 +425,22 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             max={sliderMax}
             step={0.1}
             value={Math.max(0, Math.min(sliderMax, progressTime))}
-            disabled={!isHost}
+            disabled={!isHost || video?.isLive}
             onChange={(e) => setSeekingTime(Number(e.target.value))}
             onMouseUp={commitSeek}
             onTouchEnd={commitSeek}
             className="range-seek w-full"
           />
           <div className="flex items-center justify-between text-xs text-theme-secondary mt-1">
-            <span>{formatTime(progressTime)}</span>
-            <span>{formatTime(duration)}</span>
+            {video?.isLive ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 bg-status-error rounded-full animate-pulse" />
+                LIVE
+              </span>
+            ) : (
+              <span>{formatTime(progressTime)}</span>
+            )}
+            <span>{video?.isLive ? '' : formatTime(duration)}</span>
           </div>
         </div>
 

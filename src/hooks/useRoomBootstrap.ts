@@ -32,6 +32,7 @@ const initialRoomState: RoomState = {
   currentVideo: null,
   currentTime: 0,
   playbackState: "unstarted",
+  syncMode: "position",
   skipEpoch: 0,
   stateVersion: 0,
   queue: [],
@@ -131,6 +132,8 @@ function normalizeVideo(input: unknown): Video | null {
     title,
     thumbnail: safeString(input.thumbnail),
     duration: Math.max(0, Math.floor(safeNumber(input.duration, 0))),
+    isLive: safeBool(input.isLive, false),
+    liveStatus: (safeString(input.liveStatus, "none") as Video["liveStatus"]),
     addedBy: safeString(input.addedBy),
     addedAt: safeString(input.addedAt),
     addedByName: safeString(input.addedByName),
@@ -195,6 +198,7 @@ function normalizeRoomSnapshot(
   );
   const autoplay = safeBool(input.autoplay, false);
   const loop = safeBool(input.loop, false);
+  const syncMode = (safeString(input.syncMode, "position") as RoomState["syncMode"]);
 
   return {
     currentVideo,
@@ -202,6 +206,7 @@ function normalizeRoomSnapshot(
     anchorPosition: Math.max(0, safeNumber(input.anchorPosition, currentTime)),
     anchorUpdatedAt: safeString(input.anchorUpdatedAt),
     playbackState: playback,
+    syncMode,
     skipEpoch,
     stateVersion,
     queue,

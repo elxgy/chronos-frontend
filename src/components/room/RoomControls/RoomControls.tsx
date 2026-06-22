@@ -18,6 +18,7 @@ import { getApiUrl } from '@/config';
 interface RoomControlsProps {
   isHost: boolean;
   isPlaying: boolean;
+  isLive?: boolean;
   loop: boolean;
   onPlay: () => void;
   onPause: () => void;
@@ -35,6 +36,7 @@ interface RoomControlsProps {
 export const RoomControls: React.FC<RoomControlsProps> = ({
   isHost,
   isPlaying,
+  isLive,
   loop,
   onPlay,
   onPause,
@@ -75,22 +77,26 @@ export const RoomControls: React.FC<RoomControlsProps> = ({
             >
               <SkipForward className="w-6 h-6" />
             </button>
-            <button
-              onClick={onSeekBack10}
-              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
-              title="Go back 10 seconds"
-              aria-label="Go back 10 seconds"
-            >
-              <Rewind className="w-6 h-6" />
-            </button>
-            <button
-              onClick={onSeekForward10}
-              className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
-              title="Skip forward 10 seconds"
-              aria-label="Skip forward 10 seconds"
-            >
-              <FastForward className="w-6 h-6" />
-            </button>
+            {!isLive && (
+              <>
+                <button
+                  onClick={onSeekBack10}
+                  className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
+                  title="Go back 10 seconds"
+                  aria-label="Go back 10 seconds"
+                >
+                  <Rewind className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={onSeekForward10}
+                  className="control-btn bg-theme-hover hover:brightness-125 text-theme-secondary"
+                  title="Skip forward 10 seconds"
+                  aria-label="Skip forward 10 seconds"
+                >
+                  <FastForward className="w-6 h-6" />
+                </button>
+              </>
+            )}
 
             <button
               onClick={() => onSetLoop(!loop)}
@@ -156,12 +162,16 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
   onAddVideo,
   onAddPlaylist,
 }) => {
-  const [videoUrl, setVideoUrl] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const searchTimeoutRef = useRef<number | null>(null);
+
+  const isUrl = (value: string) => {
+    const parsed = parseYouTubeInput(value);
+    return !!(parsed.videoId || parsed.playlistId);
+  };
 
   const handleSearch = async (query: string) => {
     if (!query.trim()) {
@@ -184,10 +194,15 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
     }
   };
 
-  const handleSearchInputChange = (value: string) => {
-    setSearchQuery(value);
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    setError('');
     if (searchTimeoutRef.current) {
       clearTimeout(searchTimeoutRef.current);
+    }
+    if (isUrl(value) || !value.trim()) {
+      setSearchResults([]);
+      return;
     }
     searchTimeoutRef.current = window.setTimeout(() => {
       handleSearch(value);
@@ -195,25 +210,23 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
   };
 
   const handleAdd = () => {
-    if (searchQuery.trim() && searchResults.length === 0) {
-      setError('No search results. Try a different query or paste a URL.');
-      return;
-    }
-    if (!videoUrl.trim()) {
+    if (!inputValue.trim()) {
       setError('Enter a YouTube URL or search for a video');
       return;
     }
-    const parsed = parseYouTubeInput(videoUrl);
+    const parsed = parseYouTubeInput(inputValue);
     if (parsed.playlistId && onAddPlaylist) {
       onAddPlaylist(parsed.playlistId);
-      setVideoUrl('');
+      setInputValue('');
+      setSearchResults([]);
       setError('');
       onClose();
       return;
     }
     if (parsed.videoId) {
       onAddVideo(parsed.videoId);
-      setVideoUrl('');
+      setInputValue('');
+      setSearchResults([]);
       setError('');
       onClose();
       return;
@@ -226,11 +239,8 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
       <div className="space-y-4">
         <Input
           placeholder="Search YouTube or paste URL..."
-          value={searchQuery}
-          onChange={(e) => {
-            handleSearchInputChange(e.target.value);
-            setError('');
-          }}
+          value={inputValue}
+          onChange={(e) => handleInputChange(e.target.value)}
           error={error}
         />
 
@@ -241,7 +251,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
                 key={result.id}
                 onClick={() => {
                   onAddVideo(result.id);
-                  setSearchQuery('');
+                  setInputValue('');
                   setSearchResults([]);
                   onClose();
                 }}
@@ -265,7 +275,7 @@ const AddVideoModal: React.FC<AddVideoModalProps> = ({
 
         <div className="flex justify-end gap-3">
           <Button variant="secondary" onClick={onClose}>Cancel</Button>
-          <Button variant="primary" onClick={handleAdd} disabled={!searchQuery.trim()}>Add</Button>
+          <Button variant="primary" onClick={handleAdd} disabled={!inputValue.trim()}>Add</Button>
         </div>
       </div>
     </Modal>

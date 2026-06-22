@@ -276,6 +276,7 @@ export const RoomPage: React.FC = () => {
               stateVersion={roomState.stateVersion}
               isPlaying={roomState.isPlaying}
               isHost={isHost}
+              syncMode={roomState.syncMode}
               onSeek={handleSeek}
               onSkip={handleSkip}
               onPlay={handlePlay}
@@ -306,6 +307,7 @@ export const RoomPage: React.FC = () => {
               <RoomControls
                 isHost={isHost}
                 isPlaying={roomState.isPlaying}
+                isLive={roomState.currentVideo?.isLive}
                 loop={roomState.loop ?? false}
                 onPlay={handlePlay}
                 onPause={handlePause}

@@ -378,8 +378,17 @@ export const Queue: React.FC<QueueProps> = ({
                       <span>{video.addedByName}</span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        {formatDuration(video.duration)}
+                        {video.isLive ? (
+                          <>
+                            <span className="w-1.5 h-1.5 bg-status-error rounded-full animate-pulse" />
+                            LIVE
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="w-3 h-3" />
+                            {formatDuration(video.duration)}
+                          </>
+                        )}
                       </span>
                     </div>
                   </div>
