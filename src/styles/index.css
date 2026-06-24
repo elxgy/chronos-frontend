@@ -386,3 +386,9 @@
 .from-theme-root\/90 { --tw-gradient-from: color-mix(in srgb, var(--bg-root) 90%, transparent); }
 .via-theme-root\/50 { --tw-gradient-via: color-mix(in srgb, var(--bg-root) 50%, transparent); }
 .placeholder-theme-muted::placeholder { color: var(--text-muted); }
+
+/* Safe area insets for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-area-top { padding-top: env(safe-area-inset-top); }
+}

@@ -50,6 +50,7 @@ export const CreateRoomPage: React.FC = () => {
           participantId: data.participantId,
           isHost: true,
           nickname,
+          sessionToken: data.sessionToken,
         }),
       );
       navigate(`/room/${normalizedCode}`, {
@@ -57,6 +58,7 @@ export const CreateRoomPage: React.FC = () => {
           participantId: data.participantId,
           isHost: true,
           nickname,
+          sessionToken: data.sessionToken,
         },
       });
     } catch (err) {

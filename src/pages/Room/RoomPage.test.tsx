@@ -34,6 +34,7 @@ function buildHookResult(overrides: Partial<UseRoomBootstrapResult>): UseRoomBoo
       participantId: 'p1',
       nickname: 'Host',
       isHost: true,
+      sessionToken: 'test-token',
     },
     roomState: baseRoomState,
     participants: [],

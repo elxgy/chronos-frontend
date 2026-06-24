@@ -78,6 +78,7 @@ export interface CreateRoomResponse {
   roomCode: RoomCode;
   participantId: UserID;
   isHost: boolean;
+  sessionToken: string;
 }
 
 export interface JoinRoomRequest {
@@ -92,6 +93,7 @@ export interface JoinRoomResponse {
   currentState: RoomState;
   participants: Participant[];
   error?: string;
+  sessionToken?: string;
 }
 
 export interface ControlMessage {

@@ -115,13 +115,13 @@ export const Chat: React.FC<ChatProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
             maxLength={500}
-            className="flex-1 bg-theme-elevated border border-theme rounded-lg px-3 py-2 text-sm text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent/50 focus:border-theme-accent"
+            className="flex-1 bg-theme-elevated border border-theme rounded-lg px-3 py-2.5 min-h-[44px] text-sm text-theme-primary placeholder-theme-muted focus:outline-none focus:ring-2 focus:ring-theme-accent/50 focus:border-theme-accent touch-manipulation"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim()}
             className={cn(
-              "p-2 rounded-lg transition-all duration-200",
+              "p-2.5 min-w-[44px] min-h-[44px] rounded-lg transition-all duration-200 flex items-center justify-center touch-manipulation",
               input.trim()
                 ? "bg-theme-accent hover:bg-theme-accent text-on-accent"
                 : "bg-theme-hover text-theme-muted cursor-not-allowed"

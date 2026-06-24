@@ -19,6 +19,7 @@ export type RoomSession = {
   participantId: string;
   nickname: string;
   isHost: boolean;
+  sessionToken: string;
 };
 
 export type BootstrapPhase =
@@ -430,6 +431,7 @@ function resolveSession(
   let nickname = routeState.nickname || "";
   let participantId = routeState.participantId || "";
   let host = Boolean(routeState.isHost);
+  let sessionToken = (routeState as Record<string, unknown>).sessionToken as string || "";
 
   if (!nickname || !participantId) {
     const stored = sessionStorage.getItem(STORAGE_KEY);
@@ -440,11 +442,13 @@ function resolveSession(
           nickname?: string;
           participantId?: string;
           isHost?: boolean;
+          sessionToken?: string;
         };
         if ((parsed.roomCode || "").toUpperCase() === code.toUpperCase()) {
           nickname = parsed.nickname || "";
           participantId = parsed.participantId || "";
           host = Boolean(parsed.isHost);
+          sessionToken = parsed.sessionToken || "";
         }
       } catch {
         sessionStorage.removeItem(STORAGE_KEY);
@@ -452,7 +456,7 @@ function resolveSession(
     }
   }
 
-  if (!nickname || !participantId) return null;
+  if (!nickname || !participantId || !sessionToken) return null;
 
   try {
     sessionStorage.setItem(
@@ -462,13 +466,14 @@ function resolveSession(
         participantId,
         isHost: host,
         nickname,
+        sessionToken,
       }),
     );
   } catch {
     return null;
   }
 
-  return { participantId, nickname, isHost: host };
+  return { participantId, nickname, isHost: host, sessionToken };
 }
 
 export type UseRoomBootstrapResult = {
@@ -818,7 +823,34 @@ export function useRoomBootstrap(
         }
 
         case "pong": {
-          // Pong received — latency is measured server-side via quality tracker
+          // Client-side latency measurement: compute RTT from sent timestamp
+          const pongPayload = message as { clientTime?: string; timestamp?: string };
+          const clientTime = pongPayload.clientTime || pongPayload.timestamp;
+          if (clientTime) {
+            const sentAt = new Date(clientTime).getTime();
+            const receivedAt = Date.now();
+            const latencyMs = Math.max(0, receivedAt - sentAt);
+            // Update local latency display — server-side quality tracker is for WS-level RTT only
+            const myId = activeSession?.participantId;
+            if (myId) {
+              dispatch(
+                {
+                  type: "UPDATE_PARTICIPANT_QUALITY",
+                  qualities: [{
+                    userId: myId,
+                    nickname: activeSession?.nickname || "",
+                    latencyMs,
+                    jitterMs: 0,
+                    packetLossPercent: 0,
+                    quality: latencyMs < 50 ? "excellent" : latencyMs < 100 ? "good" : latencyMs < 200 ? "fair" : "poor",
+                    lastPingAt: new Date().toISOString(),
+                    isConnected: true,
+                  }],
+                },
+                "ws_pong_latency",
+              );
+            }
+          }
           break;
         }
 
@@ -882,6 +914,7 @@ export function useRoomBootstrap(
       const wsUrl = getWsUrl("/ws", {
         roomCode: code,
         participantId: activeSession.participantId,
+        sessionToken: activeSession.sessionToken,
       });
       const socket = new WebSocket(wsUrl);
 

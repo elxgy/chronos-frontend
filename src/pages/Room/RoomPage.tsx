@@ -329,7 +329,7 @@ export const RoomPage: React.FC = () => {
           className={cn(
             "border-l-2 border-theme bg-theme-surface/95 backdrop-blur-sm flex flex-col transition-all duration-300 shrink-0",
             showSidebar
-              ? "fixed inset-x-0 bottom-0 z-30 flex flex-col w-full sm:left-auto sm:right-0 sm:w-96 top-[var(--header-height)] lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96"
+              ? "fixed inset-x-0 bottom-0 z-30 flex flex-col w-full lg:relative lg:inset-auto lg:bottom-auto lg:top-auto lg:w-96 top-[var(--header-height)]"
               : "hidden",
           )}
         >
@@ -410,7 +410,7 @@ export const RoomPage: React.FC = () => {
         {!showSidebar && (
           <button
             onClick={() => setShowSidebar(true)}
-            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-theme-elevated border-2 border-theme px-4 py-2.5 rounded-xl text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-hover hover:brightness-125 active:scale-95 transition-all duration-150 touch-manipulation shadow-lg"
+            className="fixed bottom-4 right-4 z-50 min-h-[48px] min-w-[48px] flex items-center justify-center bg-theme-elevated border-2 border-theme px-4 py-2.5 rounded-xl text-sm font-medium text-theme-secondary hover:text-theme-primary hover:bg-theme-hover hover:brightness-125 active:scale-95 transition-all duration-150 touch-manipulation shadow-lg safe-area-bottom"
             aria-label="Show panel"
           >
             Queue & People

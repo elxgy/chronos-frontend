@@ -89,7 +89,7 @@ export const Header: React.FC<HeaderProps> = ({
             {showBack && (
               <button
                 onClick={onBack}
-                className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-theme-elevated hover:brightness-125 active:scale-90 transition-all duration-150 flex-shrink-0"
+                className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-theme-elevated hover:brightness-125 active:scale-90 transition-all duration-150 flex-shrink-0 touch-manipulation"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-5 h-5 text-theme-secondary" />
@@ -105,7 +105,7 @@ export const Header: React.FC<HeaderProps> = ({
             {roomCode && (
               <button
                 onClick={handleCopyCode}
-                className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 bg-theme-elevated rounded-lg border border-theme hover:bg-theme-hover hover:brightness-125 active:scale-[0.98] transition-all duration-150 min-h-[36px] touch-manipulation group/copy min-w-0 max-w-[140px] sm:max-w-[180px]"
+                className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 bg-theme-elevated rounded-lg border border-theme hover:bg-theme-hover hover:brightness-125 active:scale-[0.98] transition-all duration-150 min-h-[44px] touch-manipulation group/copy min-w-0 max-w-[140px] sm:max-w-[180px]"
                 title={copyFailed ? 'Copy failed' : 'Copy room link'}
               >
                 <span className="text-xs font-medium text-theme-muted uppercase tracking-wider hidden sm:inline shrink-0">
@@ -129,7 +129,7 @@ export const Header: React.FC<HeaderProps> = ({
 
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             {participantCount !== undefined && (
-              <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 bg-theme-elevated rounded-lg border border-theme min-h-[36px]">
+              <div className="flex items-center gap-2 px-2.5 sm:px-3 py-1.5 bg-theme-elevated rounded-lg border border-theme min-h-[44px]">
                 <span className="relative flex h-2.5 w-2.5">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-status-success opacity-75" />
                   <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-status-success" />
@@ -144,7 +144,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="relative" ref={themeMenuRef}>
               <button
                 onClick={() => setShowThemeMenu(!showThemeMenu)}
-                className="min-w-[36px] min-h-[36px] p-2 rounded-lg text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated hover:brightness-125 active:scale-90 transition-all duration-150 touch-manipulation"
+                className="min-w-[44px] min-h-[44px] p-2 rounded-lg text-theme-muted hover:text-theme-secondary hover:bg-theme-elevated hover:brightness-125 active:scale-90 transition-all duration-150 touch-manipulation"
                 aria-label="Change theme"
               >
                 <Paintbrush className="w-4 h-4" />
@@ -175,7 +175,7 @@ export const Header: React.FC<HeaderProps> = ({
             {onLeave && (
               <button
                 onClick={onLeave}
-                className="btn-ghost text-sm text-status-error hover:text-status-error hover:bg-status-error/10 active:scale-95 transition-all duration-150 min-h-[36px] px-3 touch-manipulation"
+                className="btn-ghost text-sm text-status-error hover:text-status-error hover:bg-status-error/10 active:scale-95 transition-all duration-150 min-h-[44px] px-3 touch-manipulation"
               >
                 Leave
               </button>
